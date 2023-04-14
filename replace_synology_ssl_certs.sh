@@ -1,19 +1,15 @@
-#!/bin/sh
-#
-# *** For DSM v7.x ***
-#
-#  Ensure you have a user setup on synology that has ssh access (and ssh access is setup).
-#     This user will need to be able to sudo as root (i.e. add this line to sudoers, <USER> is the user you create):
-#       <USER> ALL=(ALL) NOPASSWD: /var/services/homes/<USER>/replace_certs.sh
-
 #!/bin/bash
+
+
+# modified version of https://gist.github.com/catchdave/69854624a21ac75194706ec20ca61327
+# *** For DSM v7.2 ***
 
 # 1. Initialization
 # =================
 [[ "$EUID" -ne 0 ]] && error_exit "Please run as root"  # Script only works as root
 [[ "${DEBUG}" ]] && set -x
 
-new_certs_origin_dir="/volume1/docker/certbot/etc_letsencrypt/live/hobbs-family.com"
+new_certs_origin_dir="/volume1/docker/certbot/etc_letsencrypt/live/{YOUR_DOMAIN_HERE}"
 certs_src_dir="/usr/syno/etc/certificate/system/default"
 target_cert_dirs=("/usr/syno/etc/certificate/system/FQDN")
 file_to_check=cert.pem
