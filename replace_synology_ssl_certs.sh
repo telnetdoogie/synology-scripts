@@ -17,16 +17,6 @@ file_to_check=cert.pem
 services_to_restart=()
 packages_to_restart=()
 
-# Add the default directory
-default_dir_name=$(</usr/syno/etc/certificate/_archive/DEFAULT)
-if [[ -n "$default_dir_name" ]]; then
-    target_cert_dirs+=("/usr/syno/etc/certificate/_archive/${default_dir_name}")
-	echo "Default cert directory found: '/usr/syno/etc/certificate/_archive/${default_dir_name}'"
-else
-	echo "No default directory found. Probably unusual? Check: 'cat /usr/syno/etc/certificate/_archive/DEFAULT'"
-fi
-
-
 # Only continue if the source certs and destination certs differ
 # ==============================================================
 CURRENT_VER=`md5sum $new_certs_origin_dir/$file_to_check | awk '{ print $1 }'`
@@ -37,11 +27,26 @@ echo "PREVIOUS_VER = $PREVIOUS_VER"
 
 
 if [ $CURRENT_VER == $PREVIOUS_VER ]; then
-	echo "New certificates and current certificates do not differ, no action"
-	exit 0
+    echo "New certificates and current certificates do not differ, no action"
+    exit 0
 else
-	echo "New certificates differ from system certificates.. replacing."
+    echo "New certificates differ from system certificates.. replacing."
 fi
+
+# Add the default directory
+default_dir_name=$(</usr/syno/etc/certificate/_archive/DEFAULT)
+if [[ -n "$default_dir_name" ]]; then
+    target_cert_dirs+=("/usr/syno/etc/certificate/_archive/${default_dir_name}")
+	echo "Default cert directory found: '/usr/syno/etc/certificate/_archive/${default_dir_name}'"
+else
+	echo "No default directory found. Probably unusual? Check: 'cat /usr/syno/etc/certificate/_archive/DEFAULT'"
+fi
+
+# Add reverse proxy app directories
+for proxy in /usr/syno/etc/certificate/ReverseProxy/*/; do
+    echo "Found Reverse Proxy dir: ${proxy}"
+    target_cert_dirs+=("${proxy}")
+done
 
 
 
@@ -50,7 +55,7 @@ fi
 cp $new_certs_origin_dir/{privkey,fullchain,cert}.pem "${certs_src_dir}/" || error_exit "Halting because of error moving files"
 chown root:root "${certs_src_dir}/"{privkey,fullchain,cert}.pem || error_exit "Halting because of error chowning files"
 chmod 600 "${certs_src_dir}/"{privkey,fullchain,cert}.pem || error_exit "Halting because of error chmoding files"
-echo "Certs moved from $new_certs_origin_dir/ & chown, chmod complete."
+echo "Certs copied from $new_certs_origin_dir/ & chown, chmod complete."
 
 # 3. Copy certificates to target directories if they exist
 # ========================================================
