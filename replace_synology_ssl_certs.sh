@@ -1,5 +1,6 @@
 #!/bin/bash
 # modified version of https://gist.github.com/catchdave/69854624a21ac75194706ec20ca61327
+# 		 from https://github.com/catchdave
 # *** For DSM v7.2 ***
 
 # 1. Initialization
@@ -7,7 +8,7 @@
 [[ "$EUID" -ne 0 ]] && error_exit "Please run as root"  # Script only works as root
 [[ "${DEBUG}" ]] && set -x
 
-new_certs_origin="/volume1/docker/certbot/etc_letsencrypt/live/{your_domain_here}"
+new_certs_origin="/volume1/docker/certbot/etc_letsencrypt/live/{yourdomainhere}"
 certs_target="/usr/syno/etc/certificate/"
 
 # Add the default directory
