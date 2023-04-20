@@ -33,15 +33,11 @@ packages_to_restart=()
 CURRENT_VER=`md5sum ${new_certs_origin}/${file_to_check} | awk '{ print $1 }'`
 PREVIOUS_VER=`md5sum ${target_cert_dir}/${file_to_check} | awk '{ print $1 }'`
 
-echo "CURRENT_VER = $CURRENT_VER"
-echo "PREVIOUS_VER = $PREVIOUS_VER"
-
-
 if [ $CURRENT_VER == $PREVIOUS_VER ]; then
-	echo "New certificates and current certificates do not differ, no action"
+	echo "New certificates and current certificates do not differ. Exiting."
 	exit 0
 else
-	echo "New certificates differ from system certificates.. replacing."
+	echo "New certificates differ from system certificates.. replacing..."
 fi
 
 # 2. Move and chown certificates from origin to destination directory
@@ -89,6 +85,31 @@ if ! /usr/syno/bin/synow3tool --nginx=reload ; then
 fi
 if ! /usr/syno/bin/synow3tool --restart-dsm-service; then
     echo "/usr/syno/bin/synow3tool --restart-dsm-service failed"
+fi
+
+# 5. Check for remaining unmatched certs
+# ======================================
+
+declare -a allcerts
+readarray -t allcerts < <(find /usr/syno/etc/certificate/ -type f -name "${file_to_check}")
+declare -a certs_unmatching
+
+for cert in "${allcerts[@]}"; do
+    THIS_VERSION=$(md5sum < ${cert} | awk '{print $1}')
+	if [ $CURRENT_VER != $THIS_VERSION ]; then
+		certs_unmatching+=("${cert}")
+	fi
+done
+if [ ! ${#certs_unmatching[@]} -eq 0 ]; then
+	echo ""
+	echo "Warning: Some unmatched certs still exist, in the following locations:"
+	echo "======================================================================"
+	for location in "${certs_unmatching[@]}"; do
+		echo "  - ${location}"
+	done
+	echo ""
+	echo "...check the script to add these folders for syncing"
+	echo ""
 fi
 
 echo "Completed"
