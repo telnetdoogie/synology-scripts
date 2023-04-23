@@ -1,9 +1,9 @@
 # synology-scripts
 A collection of scripts I use on my synology NAS
 
-* [Check Certs](#check-certs) 
-* [Copy Updated Certs](#copy-certs) 
-* [Replace Synology Certs](#replace-certs) 
+* [Check Certs](#check-certs) - Check certificates deployed to synology NAS against a new certificate
+* [Copy Updated Certs](#copy-certs) - Copy new certificates and generated keystore to a specified location for use elsewhere on the network
+* [Replace Synology Certs](#replace-certs) - Deploy newly generated certificates to the Synology - includes DSM and Reverse Proxy certificates.
 
 ## <a name="check-certs"></a>Check Certs
 [check_certs.sh](./check_certs.sh) 
