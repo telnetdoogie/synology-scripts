@@ -1,9 +1,7 @@
 #!/bin/bash
-# *** For DSM v7.x ***
-#
-#  Ensure you have a user setup on synology that has ssh access (and ssh access is setup).
-#     This user will need to be able to sudo as root (i.e. add this line to sudoers, <USER> is the user you create):
-#       <USER> ALL=(ALL) NOPASSWD: /var/services/homes/<USER>/replace_certs.sh
+# modified version of https://gist.github.com/catchdave/69854624a21ac75194706ec20ca61327
+# 		 from https://github.com/catchdave
+# *** For DSM v7.2 **
 
 # Check for --force and --debug parameters
 force=0
@@ -17,10 +15,10 @@ for arg in "$@"; do
 done
 
 # CONSTANTS
-NEW_CERTIFICATE_LOCATION="/volume1/docker/certbot/etc_letsencrypt/live/{your_domain_here}"	# location of your updated / generated certs
+NEW_CERTIFICATE_LOCATION="/volume1/docker/certbot/etc_letsencrypt/live/{your_domain_name}"	# location of your updated / generated certs
 SYSTEM_CERTIFICATES_ROOT="/usr/syno/etc/certificate/"						# location of the root certificates folder
 CERTIFICATE_FILENAME=cert.pem									# certificate file for comparing old / new															
-TARGET_FOLDERS=("/usr/syno/etc/certificate/smbftpd/ftpd"							
+TARGET_FOLDERS=("/usr/syno/etc/certificate/smbftpd/ftpd"									
                     "/usr/syno/etc/certificate/kmip/kmip")					# any folders not otherwise covered by the script
 SERVICES_TO_RESTART=("kmip" "ftpd")								# a list of the synology services needing to be restarted
 PACKAGES_TO_RESTART=()										# a list of the synology packages needing to be restarted
@@ -59,8 +57,8 @@ function find_unmatched_certs() {
         done
         echo 
         echo "...check the script and add these folders to TARGET_FOLDERS for syncing"
-	echo "  this script can then be run again with the '--force' parameter to force push to new folders"
-        echo 
+		echo "  this script can then be run again with the '--force' parameter to force push to new folders"
+		echo 
     fi
 }
 
