@@ -5,7 +5,7 @@ SCP_USER=admin
 FILE_TO_CHECK=cert.pem
 FILES_TO_COPY=("cert.pem" "privkey.pem" "fullchain.pem")
 OUTPUT_FILE=cert.pem
-SYSTEM_CERT_PATH=/usr/syno/etc/certificate/system/default
+NEW_CERT_PATH=/volume1/docker/certbot/etc_letsencrypt/live/{your_domain_here}
 DESTINATION_PATH=/var/services/homes/admin/ssl_certs
 KEYTOOL_PATH=/var/packages/java-installer/target/bin
 
@@ -16,17 +16,17 @@ KEYSTORE_ALIAS=unifi
 
 # Get MD5 Hash representations of the current cert file
 #  and the previously copied version in the destination for comparison
-CURRENT_VER=`md5sum $SYSTEM_CERT_PATH/$FILE_TO_CHECK | awk '{ print $1 }'`
+CURRENT_VER=`md5sum $NEW_CERT_PATH/$FILE_TO_CHECK | awk '{ print $1 }'`
 PREVIOUS_VER=`md5sum $DESTINATION_PATH/$OUTPUT_FILE | awk '{ print $1 }'`
 
-if [ $CURRENT_VER == $PREVIOUS_VER ]; then
+if [[ "$CURRENT_VER" == "$PREVIOUS_VER" ]]; then
   echo "Certificates have not been updated, no action"
   exit 0
 else
   echo "Certificates have been updated; Copying to new location"
   rm $DESTINATION_PATH/*
   for FILE in "${FILES_TO_COPY[@]}"; do
-     if ! cp "$SYSTEM_CERT_PATH/$FILE" "$DESTINATION_PATH/$FILE"; then
+     if ! cp "$NEW_CERT_PATH/$FILE" "$DESTINATION_PATH/$FILE"; then
          echo "Error copying $FILE"
          exit 1
      fi
