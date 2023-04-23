@@ -1,11 +1,11 @@
 # synology-scripts
 A collection of scripts I use on my synology NAS
 
-* [Check Certs](#check-certs) \
-* [Copy Updated Certs](#copy-certs) \
-* [Replace Synology Certs](#replace-certs) \
+* [Check Certs](#check-certs) 
+* [Copy Updated Certs](#copy-certs) 
+* [Replace Synology Certs](#replace-certs) 
 
-### <a name="check-certs"></a>Check Certs
+## <a name="check-certs"></a>Check Certs
 [check_certs.sh](./check_certs.sh) 
 This script can be used to find certificate locations that differ from the input certificate:
 ```
@@ -36,7 +36,7 @@ The following certificates do not match the current version:
 ```
 This script does not make any changes to any files.
 
-### <a name="copy-certs"></a>Copy Certs
+## <a name="copy-certs"></a>Copy Certs
 [copy_SSL_certs.sh](./copy_SSL_certs.sh)
 This script can be used to copy certificates, and generate a new `keystore` file specifically for use on the Unifi platform
 (I use this to generate `keystore` file for a Unifi Dream Machine Pro)
@@ -57,7 +57,7 @@ Things to change for your setup:
 `DESTINATION_PATH` - Destination you want your files to be copied to \
 `SCP_USER` - The user that will be used to SCP into the location to pick up the files from any external boxes \
 
-### <a name="replace-certs"></a>Replace Synology Certs
+## <a name="replace-certs"></a>Replace Synology Certs
 [replace_synology_ssl_certs.sh](./replace_synology_ssl_certs.sh)
 
 This script updates the SSL/TLS certificates for Synology services, specifically for DSM v7.2. It copies the new certificates to the appropriate directories, and then restarts the affected services and packages.
