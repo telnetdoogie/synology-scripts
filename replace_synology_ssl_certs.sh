@@ -2,6 +2,18 @@
 # modified version of https://gist.github.com/catchdave/69854624a21ac75194706ec20ca61327
 # 		 from https://github.com/catchdave
 #
+# - Important:
+#       Before this script can run reliably, you must first manually import your LE certificates into DSM.
+#       	Private Key ---------------> privkey.pem
+#       	Certificate ---------------> cert.pem
+#		Intermediate Certificate --> fullchain.pem
+#
+#	It's possible to initially import certs WITHOUT adding an Intermediate Cert, and while this works in most cases,
+#	it will cause OpenVPN on Synology to fail, as it requires the intermediate certs present in fullchain.pem
+#	You can also add fullchain.pem as the "Certificate" file, which works, but it's important to upload the correct files 
+#	as above, so that the synology certificate sync tool will write the correct contents into the "info" files and associate
+#	the correct files with the "cert", "chain", and "key".
+#
 # *** For DSM v7.2 **
 
 # Check for --force and --debug parameters
@@ -16,7 +28,7 @@ for arg in "$@"; do
 done
 
 # CONSTANTS
-NEW_CERTIFICATE_LOCATION="/volume1/docker/certbot/etc_letsencrypt/live/{your_domain_name}"	# location of your updated / generated certs
+NEW_CERTIFICATE_LOCATION="/volume1/docker/certbot/etc_letsencrypt/live/{your-domain-name}"	# location of your updated / generated certs
 SYSTEM_CERTIFICATES_ROOT="/usr/syno/etc/certificate/"						# location of the root certificates folder
 CERTIFICATE_FILENAME=cert.pem									# certificate file for comparing old / new															
 TARGET_FOLDERS=("/usr/syno/etc/certificate/smbftpd/ftpd"									
@@ -98,9 +110,9 @@ fi
 
 # 2. Move and chown certificates from origin to destination directory
 # ===================================================================
-cp $NEW_CERTIFICATE_LOCATION/{privkey,fullchain,cert}.pem "${DEFAULT_TARGET_FOLDER}/" || error_exit "Halting because of error moving files"
-chown root:root "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert}.pem || error_exit "Halting because of error chowning files"
-chmod 400 "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert}.pem || error_exit "Halting because of error chmoding files"
+cp $NEW_CERTIFICATE_LOCATION/{cert,chain,fullchain,privkey}.pem "${DEFAULT_TARGET_FOLDER}/" || error_exit "Halting because of error moving files"
+chown root:root "${DEFAULT_TARGET_FOLDER}/"{cert,chain,fullchain,privkey}.pem || error_exit "Halting because of error chowning files"
+chmod 400 "${DEFAULT_TARGET_FOLDER}/"{cert,chain,fullchain,privkey}.pem || error_exit "Halting because of error chmoding files"
 echo "Certs copied from $NEW_CERTIFICATE_LOCATION/ to " 
 echo "         $DEFAULT_TARGET_FOLDER/ & chown, chmod complete."
 
@@ -112,9 +124,9 @@ for target_dir in "${TARGET_FOLDERS[@]}"; do
 		continue
 	fi
 	echo "Copying certificates to '$target_dir'"
-	if ! cp "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert}.pem "$target_dir/" && \
-		chown root:root "$target_dir/"{privkey,fullchain,cert}.pem &&\
-		chmod 400 "$target_dir/"{privkey,fullchain,cert}.pem; then
+	if ! cp "${DEFAULT_TARGET_FOLDER}/"{cert,chain,fullchain,privkey}.pem "$target_dir/" && \
+		chown root:root "$target_dir/"{cert,chain,fullchain,privkey}.pem &&\
+		chmod 400 "$target_dir/"{cert,chain,fullchain,privkey}.pem; then
 		echo "Error copying certs or with chmod, chown to ${target_dir}"
 	fi
 done
