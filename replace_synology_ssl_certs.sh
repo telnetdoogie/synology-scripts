@@ -1,6 +1,10 @@
 #!/bin/bash
 # modified version of https://gist.github.com/catchdave/69854624a21ac75194706ec20ca61327
 # 		 from https://github.com/catchdave
+#
+# Note: You should download the R3 intermediate certificate from here: https://letsencrypt.org/certificates/
+#   ...and put it alongside your generated certs, by using a symbolic link named syno-ca-cert.pem
+#   ...this will ensure your synology 'sees' the intermediate cert and allows you to use your custom certs for VPN etc.
 # *** For DSM v7.2 **
 
 # Check for --force and --debug parameters
@@ -97,9 +101,9 @@ fi
 
 # 2. Move and chown certificates from origin to destination directory
 # ===================================================================
-cp $NEW_CERTIFICATE_LOCATION/{privkey,fullchain,cert}.pem "${DEFAULT_TARGET_FOLDER}/" || error_exit "Halting because of error moving files"
-chown root:root "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert}.pem || error_exit "Halting because of error chowning files"
-chmod 400 "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert}.pem || error_exit "Halting because of error chmoding files"
+cp $NEW_CERTIFICATE_LOCATION/{privkey,fullchain,cert,syno-ca-cert}.pem "${DEFAULT_TARGET_FOLDER}/" || error_exit "Halting because of error moving files"
+chown root:root "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert,syno-ca-cert}.pem || error_exit "Halting because of error chowning files"
+chmod 400 "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert,syno-ca-cert}.pem || error_exit "Halting because of error chmoding files"
 echo "Certs copied from $NEW_CERTIFICATE_LOCATION/ to " 
 echo "         $DEFAULT_TARGET_FOLDER/ & chown, chmod complete."
 
@@ -111,9 +115,9 @@ for target_dir in "${TARGET_FOLDERS[@]}"; do
 		continue
 	fi
 	echo "Copying certificates to '$target_dir'"
-	if ! cp "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert}.pem "$target_dir/" && \
-		chown root:root "$target_dir/"{privkey,fullchain,cert}.pem &&\
-		chmod 400 "$target_dir/"{privkey,fullchain,cert}.pem; then
+	if ! cp "${DEFAULT_TARGET_FOLDER}/"{privkey,fullchain,cert,syno-ca-cert}.pem "$target_dir/" && \
+		chown root:root "$target_dir/"{privkey,fullchain,cert,syno-ca-cert}.pem &&\
+		chmod 400 "$target_dir/"{privkey,fullchain,cert,syno-ca-cert}.pem; then
 		echo "Error copying certs or with chmod, chown to ${target_dir}"
 	fi
 done
