@@ -89,7 +89,7 @@ Typical output for a forced deployment looks similar to:
 Default cert directory found: /usr/syno/etc/certificate/_archive/xynzcj
 New certificates and current certificates do not differ.
 --force parameter passed to script. Redeploying certificates...
-Certs copied from /volume1/docker/certbot/etc_letsencrypt/live/hobbs-family.com/ to
+Certs copied from /volume1/docker/certbot/etc_letsencrypt/live/my-domain.com/ to
          /usr/syno/etc/certificate/_archive/xynzcj/ & chown, chmod complete.
 Copying certificates to '/usr/syno/etc/certificate/smbftpd/ftpd'
 Copying certificates to '/usr/syno/etc/certificate/kmip/kmip'
