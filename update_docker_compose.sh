@@ -39,7 +39,7 @@ fi
 echo "Installing latest version of docker-compose..."
 
    mv $COMPOSE_PATH/docker-compose $COMPOSE_PATH/docker-compose.$CURRENT_COMPOSE_VER && \
-   curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o $COMPOSE_PATH/docker-compose && \
+   curl -s -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o $COMPOSE_PATH/docker-compose && \
    chmod 755 $COMPOSE_PATH/docker-compose
 
 NEW_COMPOSE_VER=$(docker-compose version | sed -n -e "s/^.*version\ //p")
