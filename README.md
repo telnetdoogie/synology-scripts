@@ -4,6 +4,7 @@ A collection of scripts I use on my synology NAS
 * [Check Certs](#check-certs) - Check certificates deployed to synology NAS against a new certificate
 * [Copy Updated Certs](#copy-certs) - Copy new certificates and generated keystore to a specified location for use elsewhere on the network
 * [Replace Synology Certs](#replace-certs) - Deploy newly generated certificates to the Synology - includes DSM and Reverse Proxy certificates.
+* [Update Docker Compose Version](#update-compose) - Update synology to the latest version of `docker-compose` 
 
 ## <a name="check-certs"></a>Check Certs
 [check_certs.sh](./check_certs.sh) 
@@ -111,5 +112,40 @@ Warning: Some unmatched certs still exist, in the following locations:
 
 Done
 ```
+
+## <a name="update-compose"></a>Update Docker Compose Version
+[update_docker_compose.sh](./update_docker_compose.sh) 
+
+This script can be used to update your Synology version of `docker-compose` to the latest version.
+This script must be run as `root` or via `sudo`
+
+**Typical Usage:** \
+```
+sudo ./update_docker_compose.sh 
+```
+
+This will check the running version of `docker-compose` on the host and, if there is a different version available, will backup the current version to `docker-compose.{version}` and download the latest version to replace the default verion.
+
+**Typical Output:**
+```
+Current version of docker-compose: v2.9.0-6413-g38f6acd
+Latest version of docker-compose: v2.18.1
+Installing latest version of docker-compose...
+New version of docker-compose: v2.18.1
+```
+
+**Forcing update:**
+To force-update docker-compose to the latest available version, run using the `--force` argument:
+
+`sudo ./update_docker_compose.sh --force` 
+```
+Current version of docker-compose: v2.18.1
+Latest version of docker-compose: v2.18.1
+Latest version of docker-compose already installed
+forcing update
+Installing latest version of docker-compose...
+New version of docker-compose: v2.18.1
+```
+
 
 
