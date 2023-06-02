@@ -6,7 +6,7 @@ This script updates the SSL/TLS certificates for Synology services, specifically
 
 To use this script, you should modify the constants in the script to match your system's configuration, such as the location of the new certificates and any 'special' target folders to copy the certificates to. You can then run the script with root privileges, and optionally with the `--force` parameter to force the script to copy the certificates even if they have not changed.
 
-#### Downloading:
+### Downloading
 
 * ssh into the synology as a user with `sudo` rights
 * download the script:
@@ -18,7 +18,7 @@ sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdo
 sudo chmod +x replace_synology_ssl_certs.sh
 ```
 
-**Typical usage:**
+### Usage
 
 This script can be scheduled to run on your Synology NAS with root priveleges. By default it will only make change if updated certificates are found in the `NEW_CERTIFICATE_LOCATION` folder. The output of this script, even if no changes are made, will include a list of certificates installed on the NAS that differ from the certificate in the `NEW_CERTIFICATE_LOCATION` folder, so you can add any locations you'd like to `TARGET_FOLDERS` if needed.
 
