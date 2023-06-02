@@ -117,6 +117,7 @@ Done
 [update_docker_compose.sh](./update_docker_compose.sh) 
 
 This script can be used to update your Synology version of `docker-compose` to the latest version.
+
 This script must be run as `root` or via `sudo`
 
 **Typical Usage:** \
