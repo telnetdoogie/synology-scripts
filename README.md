@@ -196,8 +196,17 @@ This will check the running version of `docker-compose` on the host and, if ther
 ```
 Current version of docker-compose: v2.9.0-6413-g38f6acd
 Latest version of docker-compose: v2.18.1
+
+
 Installing latest version of docker-compose...
-New version of docker-compose: v2.18.1
+Backing up current version of docker-compose...
+  creating backup << /var/packages/ContainerManager/target/usr/bin/docker-compose.v2.9.0-6413-g38f6acd >>
+  new docker-compose created
+New version of docker-compose returns:  v2.18.1
+
+  to revert / replace with previous version, use the following command:
+  sudo mv /var/packages/ContainerManager/target/usr/bin/docker-compose.v2.9.0-6413-g38f6acd /var/packages/ContainerManager/target/usr/bin/docker-compose
+
 ```
 
 **Forcing update:**
@@ -207,10 +216,18 @@ To force-update docker-compose to the latest available version, run using the `-
 ```
 Current version of docker-compose: v2.18.1
 Latest version of docker-compose: v2.18.1
-Latest version of docker-compose already installed
-forcing update
+
+Latest version of docker-compose already installed!
+ - forcing update
+
 Installing latest version of docker-compose...
-New version of docker-compose: v2.18.1
+Backing up current version of docker-compose...
+  creating backup << /var/packages/ContainerManager/target/usr/bin/docker-compose.v2.18.1 >>
+  new docker-compose created
+New version of docker-compose returns:  v2.18.1
+
+  to revert / replace with previous version, use the following command:
+  sudo mv /var/packages/ContainerManager/target/usr/bin/docker-compose.v2.18.1 /var/packages/ContainerManager/target/usr/bin/docker-compose
 ```
 
 
