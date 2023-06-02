@@ -12,7 +12,7 @@ I schedule this script to run nightly.
 - If a new cert is detected, it will copy files and generate keystore, and exit with code 1.
   Exiting with code 1 on a 'successful push' allows "Send run details only when the script terminates abnormally" on the Synology Task Scheduler to send an email summarizing that changes were made.
 
-#### Downloading:
+### Downloading
 
 * ssh into the synology as a user with `sudo` rights
 * download the script:
@@ -23,6 +23,8 @@ sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdo
 ```
 sudo chmod +x check_certs.sh
 ```
+
+### Usage
 
 You will need to edit parameters in this file to suit your specific setup:
 
