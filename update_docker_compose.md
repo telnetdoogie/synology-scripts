@@ -5,7 +5,7 @@ This script can be used to update your Synology version of `docker-compose` to t
 
 This script must be run as `root` or via `sudo`
 
-### Downloading:
+### Downloading
 
 * ssh into the synology as a user with `sudo` rights
 * download the script:
