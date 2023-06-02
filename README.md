@@ -22,12 +22,12 @@ do not match the certificate passed in.
 
 #### Downloading:
 
-1. ssh into the synology as a user with `sudo` rights
-2. download the script:
+* ssh into the synology as a user with `sudo` rights
+* download the script:
 ```
 sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/check_certs.sh
 ```
-3. Make it executable:
+* Make it executable:
 ```
 sudo chmod +x check_certs.sh
 ```
@@ -73,11 +73,15 @@ Exiting with code 1 on a 'successful push' allows "Send run details only when th
 
 #### Downloading:
 
- - ssh into the synology as a user with `sudo` rights
- - download the script:
-   - `sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/check_certs.sh`
- - Make it executable:
-   - `sudo chmod +x check_certs.sh`
+* ssh into the synology as a user with `sudo` rights
+* download the script:
+```
+sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/check_certs.sh
+```
+* Make it executable:
+```
+sudo chmod +x check_certs.sh
+```
 
 Output when certificates are found and moved:
 ```
@@ -101,11 +105,15 @@ To use this script, you should modify the constants in the script to match your 
 
 #### Downloading:
 
- - ssh into the synology as a user with `sudo` rights
- - download the script:
-   - `sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/replace_synology_ssl_certs.sh`
- - Make it executable:
-   - `sudo chmod +x replace_synology_ssl_certs.sh`
+* ssh into the synology as a user with `sudo` rights
+* download the script:
+```
+sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/replace_synology_ssl_certs.sh
+```
+* Make it executable:
+```
+sudo chmod +x replace_synology_ssl_certs.sh
+```
 
 **Typical usage:**
 This script can be scheduled to run on your Synology NAS with root priveleges. By default it will only make change if updated certificates are found in the `NEW_CERTIFICATE_LOCATION` folder. The output of this script, even if no changes are made, will include a list of certificates installed on the NAS that differ from the certificate in the `NEW_CERTIFICATE_LOCATION` folder, so you can add any locations you'd like to `TARGET_FOLDERS` if needed.
@@ -167,11 +175,15 @@ This script must be run as `root` or via `sudo`
 
 #### Downloading:
 
- - ssh into the synology as a user with `sudo` rights
- - download the script:
-   - `sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/update_docker_compose.sh`
- - Make it executable:
-   - `sudo chmod +x update_docker_compose.sh`
+* ssh into the synology as a user with `sudo` rights
+* download the script:
+```
+sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/update_docker_compose.sh
+```
+* Make it executable:
+```
+sudo chmod +x update_docker_compose.sh
+```
 
 **Typical Usage:** \
 ```
