@@ -10,7 +10,7 @@ It needs to be run as root (`sudo`) in order to access the synology's certificat
 Pass in a full path to a `cert.pem` file and it will walk the Synology certificates folder to check for certificates that
 do not match the certificate passed in.
 
-#### Downloading:
+### Downloading
 
 * ssh into the synology as a user with `sudo` rights
 * download the script:
@@ -22,9 +22,7 @@ sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdo
 sudo chmod +x check_certs.sh
 ```
 
----
-
-**Typical Usage:**
+### Usage
 
 ```
 sudo ./check_certs.sh /volume1/docker/certbot/etc_letsencrypt/live/my-domain.com/cert.pem
