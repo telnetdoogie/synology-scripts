@@ -6,6 +6,8 @@ A collection of scripts I use on my synology NAS
 * [Replace Synology Certs](#replace-certs) - Deploy newly generated certificates to the Synology - includes DSM and Reverse Proxy certificates.
 * [Update Docker Compose Version](#update-compose) - Update synology to the latest version of `docker-compose` 
 
+---
+
 ## <a name="check-certs"></a>Check Certs
 
 [check_certs.sh](./check_certs.sh) 
@@ -20,11 +22,15 @@ do not match the certificate passed in.
 
 #### Downloading:
 
- - ssh into the synology as a user with `sudo` rights
- - download the script:
-   - `sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/check_certs.sh`
- - Make it executable:
-   - `sudo chmod +x check_certs.sh`
+1. ssh into the synology as a user with `sudo` rights
+2. download the script:
+```
+sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/check_certs.sh
+```
+3. Make it executable:
+```
+sudo chmod +x check_certs.sh
+```
 
 **Typical Usage:** 
 
@@ -48,6 +54,8 @@ The following certificates do not match the current version:
     - /usr/syno/etc/certificate/temp2/cert.pem
 ```
 This script does not make any changes to any files.
+
+---
 
 ## <a name="copy-certs"></a>Copy Certs
 
@@ -81,6 +89,8 @@ Things to change for your setup:
 `NEW_CERT_PATH` - The location of your 'live' CERT files, perhaps from a `certbot` output \
 `DESTINATION_PATH` - Destination you want your files to be copied to \
 `SCP_USER` - The user that will be used to SCP into the location to pick up the files from any external boxes \
+
+---
 
 ## <a name="replace-certs"></a>Replace Synology Certs
 [replace_synology_ssl_certs.sh](./replace_synology_ssl_certs.sh)
@@ -144,6 +154,8 @@ Warning: Some unmatched certs still exist, in the following locations:
 
 Done
 ```
+
+---
 
 ## <a name="update-compose"></a>Update Docker Compose Version
 [update_docker_compose.sh](./update_docker_compose.sh) 
