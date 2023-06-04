@@ -2,17 +2,21 @@
 
 # inspired by https://gist.github.com/deviantony/2b5078fe1675a5fedabf1de3d1f2652a
 
-COMPOSE_PATH=/var/packages/ContainerManager/target/usr/bin
-
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root. Please run with sudo."
    exit 1
 fi
 
-if [[ ! -f "$COMPOSE_PATH/docker-compose" ]]; then
+#find docker-compose
+COMPOSE_EXEC=$(which docker-compose)
+
+if [[ -z "${COMPOSE_EXEC}"  ]]; then
     echo "Error: docker-compose not found in system path."
     exit 1
 fi
+
+#get path to docker-compose
+COMPOSE_PATH=$(dirname $(readlink ${COMPOSE_EXEC}))
 
 force=0
 for arg in "$@"; do
