@@ -66,3 +66,5 @@ Warning: Some unmatched certs still exist, in the following locations:
 
 Done
 ```
+
+*Notice in the above outputs, I have created bogus certs in `usr/syno/etc/certificate/temp/` and `usr/syno/etc/certificate/temp2/` just to illustrate the output you might see if you have additional certificates that still differ once the script is complete. This output is useful in guiding you to add additional folders to the script*
