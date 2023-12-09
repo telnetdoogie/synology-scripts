@@ -11,7 +11,7 @@ To use this script, you should modify the constants in the script to match your 
 * ssh into the synology as a user with `sudo` rights
 * download the script:
 ```
-sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/replace_synology_ssl_certs.sh
+sudo wget -O replace_synology_ssl_certs.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/replace_synology_ssl_certs.sh
 ```
 * Make it executable:
 ```
