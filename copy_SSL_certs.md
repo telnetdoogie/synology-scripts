@@ -17,11 +17,11 @@ I schedule this script to run nightly.
 * ssh into the synology as a user with `sudo` rights
 * download the script:
 ```
-sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/check_certs.sh
+sudo wget -O copy_SSL_certs.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/copy_SSL_certs.sh
 ```
 * Make it executable:
 ```
-sudo chmod +x check_certs.sh
+sudo chmod +x copy_SSL_certs.sh
 ```
 
 ### Usage

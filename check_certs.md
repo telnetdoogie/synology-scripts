@@ -15,7 +15,7 @@ do not match the certificate passed in.
 * ssh into the synology as a user with `sudo` rights
 * download the script:
 ```
-sudo wget -O update_docker_compose.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/check_certs.sh
+sudo wget -O check_certs.sh https://raw.githubusercontent.com/telnetdoogie/synology-scripts/main/check_certs.sh
 ```
 * Make it executable:
 ```
