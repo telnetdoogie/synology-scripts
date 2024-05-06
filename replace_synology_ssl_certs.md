@@ -2,6 +2,8 @@
 
 [replace_synology_ssl_certs.sh](./replace_synology_ssl_certs.sh)
 
+_Based on / Inspired by [this gist](https://gist.github.com/catchdave/69854624a21ac75194706ec20ca61327) by @catchdave_
+
 This script updates the SSL/TLS certificates for Synology services, specifically for DSM v7.2. It copies the new certificates to the appropriate directories, and then restarts the affected services and packages.
 
 To use this script, you should modify the constants in the script to match your system's configuration, such as the location of the new certificates and any 'special' target folders to copy the certificates to. You can then run the script with root privileges, and optionally with the `--force` parameter to force the script to copy the certificates even if they have not changed.
