@@ -31,8 +31,11 @@ done
 NEW_CERTIFICATE_LOCATION="/volume1/docker/certbot/etc_letsencrypt/live/{your-domain-name}"	# location of your updated / generated certs
 SYSTEM_CERTIFICATES_ROOT="/usr/syno/etc/certificate/"						# location of the root certificates folder
 CERTIFICATE_FILENAME=cert.pem									# certificate file for comparing old / new															
-TARGET_FOLDERS=("/usr/syno/etc/certificate/smbftpd/ftpd"									
-                    "/usr/syno/etc/certificate/kmip/kmip")					# any folders not otherwise covered by the script
+
+#TARGET_FOLDERS=("/usr/syno/etc/certificate/smbftpd/ftpd"									
+#                    "/usr/syno/etc/certificate/kmip/kmip")					# any folders not otherwise covered by the script
+
+TARGET_FOLDERS=()										# any folders not otherwise covered by the script
 # SERVICES_TO_RESTART=("kmip" "ftpd")								# a list of the synology services needing to be restarted
 SERVICES_TO_RESTART=()
 PACKAGES_TO_RESTART=("VPNCenter")								# a list of the synology packages needing to be restarted (DSM 7.1 +)
