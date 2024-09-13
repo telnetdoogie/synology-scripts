@@ -33,7 +33,9 @@ SYSTEM_CERTIFICATES_ROOT="/usr/syno/etc/certificate/"						# location of the roo
 CERTIFICATE_FILENAME=cert.pem									# certificate file for comparing old / new															
 TARGET_FOLDERS=("/usr/syno/etc/certificate/smbftpd/ftpd"									
                     "/usr/syno/etc/certificate/kmip/kmip")					# any folders not otherwise covered by the script
-SERVICES_TO_RESTART=("kmip" "ftpd")								# a list of the synology services needing to be restarted
+# SERVICES_TO_RESTART=("kmip" "ftpd")								# a list of the synology services needing to be restarted
+SERVICES_TO_RESTART=()
+# PACKAGES_TO_RESTART=("VPNCenter")								# a list of the synology packages needing to be restarted
 PACKAGES_TO_RESTART=()										# a list of the synology packages needing to be restarted
 
 # Functions
