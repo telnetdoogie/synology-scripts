@@ -35,8 +35,7 @@ TARGET_FOLDERS=("/usr/syno/etc/certificate/smbftpd/ftpd"
                     "/usr/syno/etc/certificate/kmip/kmip")					# any folders not otherwise covered by the script
 # SERVICES_TO_RESTART=("kmip" "ftpd")								# a list of the synology services needing to be restarted
 SERVICES_TO_RESTART=()
-# PACKAGES_TO_RESTART=("VPNCenter")								# a list of the synology packages needing to be restarted
-PACKAGES_TO_RESTART=()										# a list of the synology packages needing to be restarted
+PACKAGES_TO_RESTART=("VPNCenter")								# a list of the synology packages needing to be restarted (DSM 7.1 +)
 
 # Functions
 # ==========
@@ -139,11 +138,13 @@ if ! /usr/syno/bin/synow3tool --gen-all ; then
     echo "synow3tool --gen-all failed"
 fi
 
+# for DSM 6 packages
 for service in "${SERVICES_TO_RESTART[@]}"; do
 	echo "restarting ${service}"
     /usr/syno/bin/synosystemctl restart "$service"
 done
 
+# for DSM 7.1+ packages
 for package in "${PACKAGES_TO_RESTART[@]}"; do  # Restart packages that are installed & turned on
 	/usr/syno/bin/synopkg is_onoff "$package" 1>/dev/null && \
 	echo "restarting ${package}" && \
