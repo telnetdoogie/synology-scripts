@@ -19,7 +19,10 @@ fi
 CURRENT_VER=$(md5sum "$1" | awk '{print $1}')
 
 declare -a allcerts
-readarray -t allcerts < <(find /usr/syno/etc/certificate/ -type f -name "cert.pem")
+readarray -t syno_certs < <(find /usr/syno/etc/certificate/ -type f -name "cert.pem")
+readarray -t local_certs < <(find /usr/local/etc/certificate/ -type f -name "cert.pem")
+allcerts+=("${syno_certs[@]}")
+allcerts+=("${local_certs[@]}")
 declare -a certs_unmatching
 
 if [ ${#allcerts[@]} -eq 0 ]; then
