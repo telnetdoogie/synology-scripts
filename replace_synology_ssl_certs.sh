@@ -32,13 +32,13 @@ NEW_CERTIFICATE_LOCATION="/volume1/docker/certbot/etc_letsencrypt/live/{your-dom
 SYSTEM_CERTIFICATES_ROOT="/usr/syno/etc/certificate/"						# location of the root certificates folder
 CERTIFICATE_FILENAME=cert.pem									# certificate file for comparing old / new															
 
-#TARGET_FOLDERS=("/usr/syno/etc/certificate/smbftpd/ftpd"									
-#                    "/usr/syno/etc/certificate/kmip/kmip")					# any folders not otherwise covered by the script
+#TARGET_FOLDERS=("/usr/local/etc/certificate/ScsiTarget/pkg-scsi-plugin-server/"									
+#                "/usr/syno/etc/certificate/kmip/kmip")						# any folders not otherwise covered by the script
 
 TARGET_FOLDERS=()										# any folders not otherwise covered by the script
 # SERVICES_TO_RESTART=("kmip" "ftpd")								# a list of the synology services needing to be restarted
-SERVICES_TO_RESTART=()
-PACKAGES_TO_RESTART=("VPNCenter")								# a list of the synology packages needing to be restarted (DSM 7.1 +)
+SERVICES_TO_RESTART=("pkg-scsi-plugin-server")
+PACKAGES_TO_RESTART=("VPNCenter" "WebStation" "ScsiTarget")					# a list of the synology packages needing to be restarted (DSM 7.1 +)
 
 # Functions
 # ==========
@@ -68,17 +68,20 @@ function find_unmatched_certs() {
         fi
     done
 
-	if [ ! ${#certs_unmatching[@]} -eq 0 ]; then
-        echo 
+    if [ ! ${#certs_unmatching[@]} -eq 0 ]; then
+        echo
         echo "Warning: Some unmatched certs still exist, in the following locations:"
         echo "======================================================================"
         for location in "${certs_unmatching[@]}"; do
             echo "  - ${location}"
         done
-        echo 
+        echo
         echo "...check the script and add these folders to TARGET_FOLDERS for syncing"
-		echo "  this script can then be run again with the '--force' parameter to force push to new folders"
-		echo 
+        echo "or alternatively add appropriate packages to PACKAGES_TO_RESTART for those services that auto-sync certs"
+        echo "(WebStation is an example of a package that will re-sync certs from the system default on restart)"
+        echo
+        echo " ...this script can then be run again with the '--force' parameter to retry"
+        echo
     fi
 }
 
