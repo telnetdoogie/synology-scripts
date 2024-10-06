@@ -72,8 +72,16 @@ function find_unmatched_certs() {
         echo
         echo "Warning: Some unmatched certs still exist, in the following locations:"
         echo "======================================================================"
-        for location in "${certs_unmatching[@]}"; do
-            echo "  - ${location}"
+        for cert in "${certs_unmatching[@]}"; do
+            dirname=$(dirname ${cert})
+            echo
+            echo "  - $dirname"
+            if [ -f "$dirname/info" ]; then
+                echo "    - Service    : $(cat "$dirname/info" | jq -r ".service")"
+                echo "    - Subscriber : $(cat "$dirname/info" | jq -r ".subscriber")"
+            else
+                echo "    - (info file not found in $dirname)"
+            fi
         done
         echo
         echo "...check the script and add these folders to TARGET_FOLDERS for syncing"
