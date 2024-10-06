@@ -85,10 +85,11 @@ function find_unmatched_certs() {
         done
         echo
         echo "...check the script and add these folders to TARGET_FOLDERS for syncing"
-        echo "or alternatively add appropriate packages to PACKAGES_TO_RESTART for those services that auto-sync certs"
-        echo "(WebStation is an example of a package that will re-sync certs from the system default on restart)"
+        echo "or alternatively add appropriate packages to PACKAGES_TO_RESTART or SERVICES_TO_RESTART for those "
+        echo "services that auto-sync certs"
+        echo "- WebStation is an example of a package that will re-sync certs from the system default on restart"
         echo
-        echo " ...this script can then be run again with the '--force' parameter to retry"
+        echo " this script can then be run again with the '--force' parameter to retry"
         echo
     fi
 }
