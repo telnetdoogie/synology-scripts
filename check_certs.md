@@ -30,17 +30,11 @@ sudo ./check_certs.sh /volume1/docker/certbot/etc_letsencrypt/live/my-domain.com
 **Typical Output:**
 
 ```
-The following certificates do not match the current version:
-    - /usr/syno/etc/certificate/_archive/xynzcj/cert.pem
-    - /usr/syno/etc/certificate/kmip/kmip/cert.pem
-    - /usr/syno/etc/certificate/smbftpd/ftpd/cert.pem
-    - /usr/syno/etc/certificate/temp/cert.pem
-    - /usr/syno/etc/certificate/system/default/cert.pem
-    - /usr/syno/etc/certificate/system/FQDN/cert.pem
-    - /usr/syno/etc/certificate/ReverseProxy/4eb86f9e-880d-47e7-9a49-e473d4383dc3/cert.pem
-    - /usr/syno/etc/certificate/ReverseProxy/209efc5f-5ff1-4f41-b34a-afa8d843814b/cert.pem
-    - /usr/syno/etc/certificate/ReverseProxy/06e7ddea-0ce5-40c0-8464-0dfd444210fe/cert.pem
-    - /usr/syno/etc/certificate/ReverseProxy/e6d25084-7f5c-426e-ae75-6ec22fe15d95/cert.pem
-    - /usr/syno/etc/certificate/temp2/cert.pem
+The following folders have certs that do not match the current version:
+
+  - /usr/local/etc/certificate/WebStation/7e8b547e-bd85-4d0e-8cb5-74d09c38e9c3
+    - Service    : 7e8b547e-bd85-4d0e-8cb5-74d09c38e9c3
+    - Subscriber : WebStation
+
 ```
-This script does not make any changes to any files.
+This script does not make any changes to any files. The `Service` and `Subscriber` fields are read from the `info` file in the certificate's location (if present) and might give clues to the certificates "owner" application or service.
