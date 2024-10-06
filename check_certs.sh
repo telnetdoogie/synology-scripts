@@ -40,6 +40,17 @@ done
 if [ ${#certs_unmatching[@]} -eq 0 ]; then
   echo "All certificates match the current version."
 else
-  echo "The following certificates do not match the current version:"
-  printf '%s\n' "${certs_unmatching[@]}" | sed 's/^/    - /'
+  echo "The following folders have certs that do not match the current version:"
+  for cert in "${certs_unmatching[@]}"; do
+    dirname=$(dirname ${cert})
+    echo
+    echo "  - $dirname"
+    if [ -f "$dirname/info" ]; then
+      echo "    - Service    : $(cat "$dirname/info" | jq -r ".service")"
+      echo "    - Subscriber : $(cat "$dirname/info" | jq -r ".subscriber")"
+    else
+      echo "    - (info file not found in $dirname)"
+    fi
+  done
 fi
+echo
