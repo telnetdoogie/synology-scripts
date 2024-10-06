@@ -55,7 +55,10 @@ error_exit() {
 function find_unmatched_certs() {
     local updated_cert_md5=$1
     declare -a allcerts
-    readarray -t allcerts < <(find ${SYSTEM_CERTIFICATES_ROOT} -type f -name "${CERTIFICATE_FILENAME}")
+    readarray -t syno_certs < <(find /usr/syno/etc/certificate/ -type f -name "cert.pem")
+    readarray -t local_certs < <(find /usr/local/etc/certificate/ -type f -name "cert.pem")
+    allcerts+=("${syno_certs[@]}")
+    allcerts+=("${local_certs[@]}")
     declare -a certs_unmatching
 
     for cert in "${allcerts[@]}"; do
