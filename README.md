@@ -29,8 +29,13 @@ Update synology to the latest version of `docker-compose`
 
 ### Miscellaneous, Simple Scripts
 
-`removeAppleHiddenFiles.sh` - Deletes Apple 'hidden' files from the /volume1/Media folder
-`showports.sh` - Show LISTEN ports in use on synology and which containers use them, for easily coming up with new unique ports to use
-`showComtainerLoggers.sh` - Iterate docker containers and show which logger is configured per container (prep for upgrading docker)
+#### `removeAppleHiddenFiles.sh` 
+- Deletes Apple 'hidden' files from the /volume1/Media folder
+
+#### `showports.sh` 
+- Show LISTEN ports in use on synology and which containers use them, for easily coming up with new unique ports to use
+
+#### `showComtainerLoggers.sh` 
+- Iterate docker containers and show which logger is configured per container (prep for upgrading docker)
 
 
