@@ -37,6 +37,9 @@ echo
 #done
 #echo "----------------------------------------------------------------------------------"
 
+
+declare -A listed_ports
+
 # Use netstat to list TCP listening ports and associated processes
 sudo netstat -tulnp | grep -E "^tcp " | while read -r line; do
     # Extract address:port and PID/process fields
@@ -45,6 +48,15 @@ sudo netstat -tulnp | grep -E "^tcp " | while read -r line; do
 
     # Extract the port number from addr_port
     port=$(echo "$addr_port" | awk -F':' '{print $NF}')
+
+	# Skip if we've already processed this port
+    if [[ -n ${listed_ports[$port]} ]]; then
+        continue
+    fi
+
+	listed_ports[$port]=1
+
+	# pad the port to 5 characters for output consistency
 	padded_port=$(printf "%5s" "$port")
 
     # Extract the PID and process name
@@ -54,9 +66,9 @@ sudo netstat -tulnp | grep -E "^tcp " | while read -r line; do
     # Check if the port belongs to a Docker container
     if [[ -n ${port_to_container[$port]} ]]; then
         container=${port_to_container[$port]}
-        echo "$padded_port | Process: $pname (PID: $pid) | Docker: $container"
+        echo "$padded_port | Container : $container (PID: $pid)"
     else
-        echo "$padded_port | Process: $pname (PID: $pid)"
+        echo "$padded_port | Process   : $pname (PID: $pid)"
     fi
 done | sort -n
 
