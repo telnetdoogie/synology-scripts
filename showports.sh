@@ -20,7 +20,7 @@ while read -r cid; do
         '{{range $p, $conf := .NetworkSettings.Ports}} {{range $conf}} {{.HostPort}} {{end}} {{end}}' "$cid")
 
     for host_port in $host_ports; do
-		printf "."
+        printf "."
         # Map the host port to the container name, only if not empty
         if [[ -n $host_port ]]; then
             port_to_container[$host_port]=$container_name
@@ -37,27 +37,24 @@ echo
 #done
 #echo "----------------------------------------------------------------------------------"
 
-
+# use this to remove duplicates
 declare -A listed_ports
 
-# Use netstat to list TCP listening ports and associated processes
 sudo netstat -tulnp | grep -E "^tcp " | while read -r line; do
     # Extract address:port and PID/process fields
     addr_port=$(echo "$line" | awk '{print $4}')
     pid_process=$(echo "$line" | awk '{print $7}')
-
     # Extract the port number from addr_port
     port=$(echo "$addr_port" | awk -F':' '{print $NF}')
 
-	# Skip if we've already processed this port
+    # Skip if we've already processed this port
     if [[ -n ${listed_ports[$port]} ]]; then
         continue
     fi
+    listed_ports[$port]=1
 
-	listed_ports[$port]=1
-
-	# pad the port to 5 characters for output consistency
-	padded_port=$(printf "%5s" "$port")
+    # pad the port to 5 characters for output consistency
+    padded_port=$(printf "%5s" "$port")
 
     # Extract the PID and process name
     pid=$(echo "$pid_process" | cut -d'/' -f1)
