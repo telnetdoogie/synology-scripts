@@ -5,8 +5,8 @@ readonly PKGS_PATH=/usr/local/etc/certificate
 readonly ARCHIVE_PATH=${CERT_PATH}/_archive
 readonly INFO_FILE=${ARCHIVE_PATH}/INFO
 readonly CONFIG_FILE="cert_config.json"  
-declare -A cert_map
-
+declare -A cert_map # a map of CertID:CN that already exist
+declare -a check_cns # CNs / Certs we will check or update
 
 # Give example usage
 usage() {
@@ -24,6 +24,7 @@ terminate() {
     exit "${2:-1}"
 }
 
+# Check whether a specific CN is in the map of cert:CNs
 cn_exists_in_cert_map() {
     local cn_to_find="$1"
     for cert_cn in "${cert_map[@]}"; do
@@ -32,6 +33,16 @@ cn_exists_in_cert_map() {
         fi
     done
     return 1  # CN not found
+}
+
+# Extract CN from a given certificate file
+get_cert_cn() {
+    local cert_file="$1"
+    if [[ -f "$cert_file" ]]; then
+        openssl x509 -in "$cert_file" -noout -subject | awk '{print $NF}'
+    else
+        echo ""
+    fi
 }
 
 # Generate an empty config file based on existing certs in use
@@ -55,10 +66,10 @@ generate_config_file() {
 	echo
 }
 
-# Function to validate an existing configuration file
-validate_config_file() {
-    echo "Checking configuration file: $CONFIG_FILE..."
-    
+# Function to read an existing configuration file
+read_config_file() {
+    echo "Reading configuration file: $CONFIG_FILE..."
+	echo    
     # Check if the config file is valid JSON
     if ! jq empty "$CONFIG_FILE" > /dev/null 2>&1; then
         terminate "Configuration file $CONFIG_FILE is not valid JSON. Please check the syntax."
@@ -78,7 +89,17 @@ validate_config_file() {
         
         if [[ -v config_map["$cn"] ]]; then  # Check if CN exists in config_map
             if [[ -n "${config_map[$cn]}" ]]; then
-                echo " - CN: $cn has a cert_path set: ${config_map[$cn]}"
+                echo " - CN: $cn has a cert_path set."
+				echo "    ${config_map[$cn]}"
+				# read the cn from the cert.pem in cert_path
+				cert_file="${config_map[$cn]}/cert.pem"
+                cert_cn=$(get_cert_cn "$cert_file")
+				if [[ "$cert_cn" == "$cn" ]]; then
+                    echo "    - CN in cert.pem matches config CN. This CN will be checked."
+                    check_cns+=("$cn")
+                else
+                    echo "    - Will not check $cn. CN in cert_path does not match ($cert_cn)."
+                fi
             else
                 echo " - CN: $cn will not be checked or updated (config file cert_path blank)"
             fi
@@ -93,8 +114,9 @@ validate_config_file() {
             echo " - CN: $config_cn has entry in config but CN not found in certs."
         fi
     done
-
-    echo "Configuration validation completed."
+	echo
+    echo "CNs to check/update: ${check_cns[@]}"
+    echo 
 }
 
 
@@ -103,7 +125,8 @@ if [[ $EUID -ne 0 ]]; then
    usage
 fi
 
-# Prepare and build array for certificate ID and cert name (CN)
+
+# build entries in the cert_map array for certificate ID and cert name (CN) from existing certs
 echo "Checking for Installed Certificates..."
 echo
 
@@ -112,7 +135,7 @@ while IFS= read -r certCode; do
     
     # Extract the CN (Common Name) from the certificate file
     if [[ -f "$cert_path" ]]; then
-        cn=$(openssl x509 -in "$cert_path" -noout -subject | awk '{print $NF}')
+        cn=$(get_cert_cn "$cert_path")
         if [[ -n "$cn" ]]; then
             echo "  cert ID: $certCode  has CN: $cn"
             cert_map["$certCode"]="$cn"
@@ -129,11 +152,14 @@ if [[ ${#cert_map[@]} -eq 0 ]]; then
     terminate "No configured certificates found"
 fi
 
-# For each installed certificate, iterate over the list of folders it's used in
-for certCode in "${!cert_map[@]}"; do
-    cn="${cert_map[$certCode]}"
+
+# Function to iterate over the list of folders for a given certCode and CN
+check_cert_folders() {
+    local certCode="$1"
+    local cn="$2"
+    local count=0
+
     echo "Checking package cert folders for cert ID: $certCode, CN: $cn..."
-    count=0
 
     # Check folders under $PKGS_PATH using isPkg == true
     while IFS= read -r pkg_folder; do
@@ -142,7 +168,7 @@ for certCode in "${!cert_map[@]}"; do
             echo " - $PKGS_PATH/$pkg_folder"
         fi
     done < <(jq -r --arg certCode "$certCode" '.[$certCode] | .services[] | select(.isPkg == true) | "\(.subscriber)/\(.service)"' "$INFO_FILE")
-    
+
     echo " ($count found)"
     echo
 
@@ -156,17 +182,22 @@ for certCode in "${!cert_map[@]}"; do
             echo " - $CERT_PATH/$cert_folder"
         fi
     done < <(jq -r --arg certCode "$certCode" '.[$certCode] | .services[] | select(.isPkg == false) | "\(.subscriber)/\(.service)"' "$INFO_FILE")
-    
+
     echo " ($count found)"
     echo
-done
+}
 
 # Check if the configuration file exists and act accordingly
 if [[ ! -f "$CONFIG_FILE" ]]; then
     generate_config_file
 fi    
 
-validate_config_file
+read_config_file
+if [[ ${#check_cns[@]} -eq 0 ]]; then
+	terminate "Done... No Certificates to Check / Update."
+fi
+
+
 
 #CURRENT_VER=$(md5sum "$1" | awk '{print $1}')
 #
