@@ -86,10 +86,20 @@ read_config_file() {
 
     # Read the CNs and cert paths from the config file into an associative array
     while IFS= read -r line; do
-        cn=$(echo "$line" | jq -r '.cn')
-        cert_path=$(echo "$line" | jq -r '.cert_path // ""')
+    
+		cn=$(echo "$line" | jq -r '.cn')
+        cert_path=$(echo "$line" | jq -r '.cert_path // ""')  # default to empty
+        
+		# Ensure CN is unique
+        if [[ -v config_map["$cn"] ]]; then
+            terminate "Duplicate CN detected in config file: $cn"
+        fi
+
+        # Store the path, ensuring only zero or one cert_path
         config_map["$cn"]="$cert_path"
-    done < <(jq -c '.config[]' "$CONFIG_FILE")
+
+
+	done < <(jq -c '.config[]' "$CONFIG_FILE")
 
     # Validate that each CN in cert_map has an entry in config_map
     for certCode in "${!cert_map[@]}"; do
