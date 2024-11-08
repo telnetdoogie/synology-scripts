@@ -4,9 +4,15 @@ readonly CERT_PATH=/usr/syno/etc/certificate
 readonly PKGS_PATH=/usr/local/etc/certificate
 readonly ARCHIVE_PATH=${CERT_PATH}/_archive
 readonly INFO_FILE=${ARCHIVE_PATH}/INFO
-readonly CONFIG_FILE="cert_config.json"  
+readonly CONFIG_FILE="cert_config.json" 
+readonly CERT_FILE="cert.pem"
 declare -A cert_map # a map of CertID:CN that already exist
 declare -a check_cns # CNs / Certs we will check or update
+declare -A config_map # map of config entries to paths
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' 
+UPDATE_MISMATCHES=false
 
 # Give example usage
 usage() {
@@ -25,15 +31,18 @@ terminate() {
 }
 
 # Check whether a specific CN is in the map of cert:CNs
-cn_exists_in_cert_map() {
+cn_exists_in_array() {
     local cn_to_find="$1"
-    for cert_cn in "${cert_map[@]}"; do
-        if [[ "$cert_cn" == "$cn_to_find" ]]; then
-            return 0  # CN found
+    shift
+    local array=("$@")
+    for this_cn in "${array[@]}"; do
+        if [[ "$this_cn" == "$cn_to_find" ]]; then
+            return 0  # CN found in array
         fi
     done
-    return 1  # CN not found
+    return 1  # CN not found in array
 }
+
 
 # Extract CN from a given certificate file
 get_cert_cn() {
@@ -76,7 +85,6 @@ read_config_file() {
     fi
 
     # Read the CNs and cert paths from the config file into an associative array
-    declare -A config_map
     while IFS= read -r line; do
         cn=$(echo "$line" | jq -r '.cn')
         cert_path=$(echo "$line" | jq -r '.cert_path // ""')
@@ -110,7 +118,7 @@ read_config_file() {
 
     # Check for entries in the config file with no corresponding CN in cert_map
     for config_cn in "${!config_map[@]}"; do
-        if ! cn_exists_in_cert_map "$config_cn"; then
+        if ! cn_exists_in_array "$config_cn" "${cert_map[@]}"; then
             echo " - CN: $config_cn has entry in config but CN not found in certs."
         fi
     done
@@ -152,12 +160,29 @@ if [[ ${#cert_map[@]} -eq 0 ]]; then
     terminate "No configured certificates found"
 fi
 
+output_folder_check_md5(){
+	local folder="$1"
+	local check_md5="$2"
+	local this_md5=$(md5sum "${folder}/${CERT_FILE}" | awk '{print $1}')
+	if [[ "$check_md5" != "$this_md5" ]]; then
+		# non-matching file
+		echo -e " - ${RED}${folder}${NC}"
+		return 1
+	else
+		# matching file
+		echo -e " - ${GREEN}${folder}${NC}"
+		return 0
+	fi
+}
+
 
 # Function to iterate over the list of folders for a given certCode and CN
 check_cert_folders() {
     local certCode="$1"
     local cn="$2"
     local count=0
+	local mismatch_count=0
+	local updated_md5=$(md5sum "${config_map["$cn"]}/${CERT_FILE}" | awk '{print $1}') 
 
     echo "Checking package cert folders for cert ID: $certCode, CN: $cn..."
 
@@ -165,25 +190,33 @@ check_cert_folders() {
     while IFS= read -r pkg_folder; do
         if [[ -d "$PKGS_PATH/$pkg_folder" ]]; then
             ((count++))
-            echo " - $PKGS_PATH/$pkg_folder"
-        fi
+			output_folder_check_md5 "$PKGS_PATH/$pkg_folder" "$updated_md5"
+			if [[ $? -eq 1 ]]; then
+				((mismatch_count++))
+			fi
+		fi
     done < <(jq -r --arg certCode "$certCode" '.[$certCode] | .services[] | select(.isPkg == true) | "\(.subscriber)/\(.service)"' "$INFO_FILE")
 
-    echo " ($count found)"
+    echo " ($count found, $mismatch_count mismatches)"
     echo
 
     # Reset count and check folders under $CERT_PATH using isPkg == false
     echo "Checking non-package cert folders for cert ID: $certCode, CN: $cn..."
     count=0
+	mismatch_count=0
+
 
     while IFS= read -r cert_folder; do
         if [[ -d "$CERT_PATH/$cert_folder" ]]; then
             ((count++))
-            echo " - $CERT_PATH/$cert_folder"
+			output_folder_check_md5 "$CERT_PATH/$cert_folder" "$updated_md5"
+			if [[ $? -eq 1 ]]; then
+                ((mismatch_count++))
+            fi
         fi
     done < <(jq -r --arg certCode "$certCode" '.[$certCode] | .services[] | select(.isPkg == false) | "\(.subscriber)/\(.service)"' "$INFO_FILE")
 
-    echo " ($count found)"
+    echo " ($count found, $mismatch_count mismatches)"
     echo
 }
 
@@ -192,10 +225,25 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     generate_config_file
 fi    
 
+# Read the config file, build check_cns array for certs to check.
 read_config_file
 if [[ ${#check_cns[@]} -eq 0 ]]; then
 	terminate "Done... No Certificates to Check / Update."
 fi
+
+
+
+# For each CN to check, iterate folders and check certs
+echo "Checking for mismatched certificates..."
+echo
+for certCode in "${!cert_map[@]}"; do
+    cn="${cert_map[$certCode]}"
+
+    if cn_exists_in_array "$cn" "${check_cns[@]}"; then
+        check_cert_folders "$certCode" "$cn"
+    fi
+done
+
 
 
 
