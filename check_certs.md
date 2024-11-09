@@ -3,12 +3,138 @@
 [check_certs.sh](./check_certs.sh)
 
 This script can be used to find certificate locations on synology NAS that differ from the provided / input certificate:
-```
-sudo check_certs.sh /path/to/certificate_to_compare.pem
-```
+
+`sudo check_certs.sh`
+
 It needs to be run as root (`sudo`) in order to access the synology's certificate folders and compare cert files.
-Pass in a full path to a `cert.pem` file and it will walk the Synology certificates folder to check for certificates that
-do not match the certificate passed in.
+
+_*** This script was recently overhauled and can now support multiple generated certificates with different common-names.***_
+
+## First time run, Configuration File
+
+The first time you run the script, it will generate a `cert_config.json` file for you in the same folder. This will contain entries for each CN (Common Name) certificate that's currently configured on your Synology. Here's my example:
+
+```console
+Checking for Installed Certificates...
+
+  cert ID: auLTvE  has CN: *.mydomain.com
+  cert ID: okVdDh  has CN: *.myseconddomain.com
+
+Configuration file does not exist.
+ - Generating new configuration file: cert_config.json
+Configuration file created successfully.
+
+ Edit the file cert_config.json and for those certs you want to check / update,
+ add the path to your new certificates in "cert_path". Leaving this blank
+ will exclude it from checks and updates.
+
+Reading configuration file: cert_config.json...
+
+ - CN: *.meandjesuswetight.com will not be checked or updated (config file cert_path blank)
+ - CN: *.hobbs-family.com will not be checked or updated (config file cert_path blank)
+
+CNs to check/update:
+
+
+Done... No Certificates to Check / Update.
+```
+After first-run, the newly created `cert_config.json` contains:
+```json
+{
+  "config": [
+    {
+      "cn": "*.mydomain.com",
+      "cert_path": ""
+    },
+    {
+      "cn": "*.myseconddomain.com",
+      "cert_path": ""
+    }
+  ]
+}
+```
+
+In order to have `check_certs.sh` look for updated versions of these certificates, you'll need to edit the `cert_path` element and put in a folder location that contains your generated certs like the below:
+
+```json
+{
+  "config": [
+    {
+      "cn": "*.mydomain.com",
+      "cert_path": "/volume1/docker/certbot/etc_letsencrypt/live/mydomain.com"
+    },
+    {
+      "cn": "*.myseconddomain.com",
+      "cert_path": "/volume1/docker/certbot/etc_letsencrypt/live/myseconddomain.com"
+    }
+  ]
+}
+```
+those folders are the destination for my **certbot** scripts that run periodically to generate LetsEncrypt certificates.
+
+## Checking your certificates, no changes (default behavior)
+
+Once those paths are in place, you can run the script again in "check only" mode (it defaults to "check only" and doesn't make change unless you pass an additional option... see below) and it will give you an output with color coding to show you which certificates are mismatched with your newly generated certificates:
+
+Running in check-only mode is done with
+
+`sudo ./check_cert.sh`
+
+```diff
+Checking for mismatched certificates...
+Checking package cert folders for cert ID: okVdDh, CN: *.mydomain.com...
+ (0 found, 0 mismatches)
+
+Checking non-package cert folders for cert ID: okVdDh, CN: *.mydomain.com...
+ - /usr/syno/etc/certificate/ReverseProxy/fce4c5b9-5e61-4eb5-93b0-02a1ae4bb826
+ - /usr/syno/etc/certificate/ReverseProxy/e2d91896-c2f1-47b6-96b6-cf3b8c626b90
+ - /usr/syno/etc/certificate/ReverseProxy/8f3339c2-3460-460b-bdcc-bc40e61fd9ee
+ (3 found, 0 mismatches)
+
+Checking package cert folders for cert ID: auLTvE, CN: *.myseconddomain.com...
+ - /usr/local/etc/certificate/ReplicationService/snapshot_receiver
+ - /usr/local/etc/certificate/LogCenter/pkg-LogCenter
+ - /usr/local/etc/certificate/ScsiTarget/pkg-scsi-plugin-server
+ (3 found, 0 mismatches)
+
+Checking non-package cert folders for cert ID: auLTvE, CN: *.myseconddomain.com...
+ - /usr/syno/etc/certificate/ReverseProxy/b9839a46-676f-43cf-9fc8-3663dc87d37d
+ - /usr/syno/etc/certificate/kmip/kmip
+ - /usr/syno/etc/certificate/smbftpd/ftpd
+ - /usr/syno/etc/certificate/ReverseProxy/bdad0b43-ddeb-404e-a8cf-a0ff787d6f4c
+ - /usr/syno/etc/certificate/ReverseProxy/13fe1307-7114-4b42-97f7-b8167fbb9438
+ - /usr/syno/etc/certificate/ReverseProxy/4c70a5e2-8380-447a-ada6-053f284be873
+ - /usr/syno/etc/certificate/ReverseProxy/4eb86f9e-880d-47e7-9a49-e473d4383dc3
+ - /usr/syno/etc/certificate/ReverseProxy/06e7ddea-0ce5-40c0-8464-0dfd444210fe
+ - /usr/syno/etc/certificate/ReverseProxy/0f611775-5c33-498f-9e84-4264a6bca8f0
+ - /usr/syno/etc/certificate/ReverseProxy/150a43fd-b74e-4271-a286-4df41e245ba2
+ - /usr/syno/etc/certificate/ReverseProxy/e6d25084-7f5c-426e-ae75-6ec22fe15d95
+ - /usr/syno/etc/certificate/ReverseProxy/04fdc8fd-6d63-4ff9-b448-fcb697b0efd7
+ - /usr/syno/etc/certificate/ReverseProxy/209efc5f-5ff1-4f41-b34a-afa8d843814b
+ - /usr/syno/etc/certificate/ReverseProxy/4679a920-1a13-47e1-a0ec-0b6dca22d75a
+ - /usr/syno/etc/certificate/ReverseProxy/7806549a-25bc-417a-8e05-0b2bfd445c02
+ - /usr/syno/etc/certificate/ReverseProxy/9e5cb385-bb66-4c96-abba-67f982bb6d1c
+ - /usr/syno/etc/certificate/ReverseProxy/733a2fb8-5007-4f52-9c63-5d50bd38490a
+ - /usr/syno/etc/certificate/system/FQDN
+ - /usr/syno/etc/certificate/system/default
+ (19 found, 0 mismatches)
+
+```
+
+( _I can't show it in Github markdown, but each cert location is colored_ $${\color{green}Green}$$ _or_ $${\color{red}Red}$$ _to show whether the certificate matches or is mismatched._)
+
+## Updating your certificates
+
+When you have certificates that show as red and need to be updated, you can run the script with
+
+`sudo ./check_certs.sh --update`
+
+The `--update` parameter will re-run the script the same as before, however it will copy your certificates from your generated folders (from the config file's `cert_path`) into your live cert folders. Once complete, it will also restart any necessary services (if it can) that were using those replaced certificates.
+
+After the certificate update, you'll see the "check" run one more time... Any previously $${\color{red}red}$$ items (mismatched certificates) should now show as $${\color{green}green}$$ which means mismatches have been fixed.
+
+Only additional services where mismatches occured will be restarted.
+
 
 ### Downloading
 
@@ -21,20 +147,3 @@ sudo wget -O check_certs.sh https://raw.githubusercontent.com/telnetdoogie/synol
 ```
 sudo chmod +x check_certs.sh
 ```
-
-### Usage
-
-```
-sudo ./check_certs.sh /volume1/docker/certbot/etc_letsencrypt/live/my-domain.com/cert.pem
-```
-**Typical Output:**
-
-```
-The following folders have certs that do not match the current version:
-
-  - /usr/local/etc/certificate/WebStation/7e8b547e-bd85-4d0e-8cb5-74d09c38e9c3
-    - Service    : 7e8b547e-bd85-4d0e-8cb5-74d09c38e9c3
-    - Subscriber : WebStation
-
-```
-This script does not make any changes to any files. The `Service` and `Subscriber` fields are read from the `info` file in the certificate's location (if present) and might give clues to the certificates "owner" application or service.
