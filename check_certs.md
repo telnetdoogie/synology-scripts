@@ -8,7 +8,7 @@ This script can be used to find certificate locations on synology NAS that diffe
 
 It needs to be run as root (`sudo`) in order to access the synology's certificate folders and compare cert files.
 
-_*** This script was recently overhauled and can now support multiple generated certificates with different common-names.***_
+_*** This script was recently rewritten from scratch and can now support multiple generated certificates with different common-names.***_
 
 ## First time run, Configuration File
 
