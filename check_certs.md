@@ -2,7 +2,7 @@
 
 [check_certs.sh](./check_certs.sh)
 
-This script can be used to find certificate locations on synology NAS that differ from the provided / input certificate:
+This script can be used to find certificate locations on synology NAS that differ from a set of newly / frequently generated certificates.
 
 `sudo check_certs.sh`
 
