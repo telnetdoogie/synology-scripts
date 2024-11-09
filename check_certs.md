@@ -30,8 +30,8 @@ Configuration file created successfully.
 
 Reading configuration file: cert_config.json...
 
- - CN: *.meandjesuswetight.com will not be checked or updated (config file cert_path blank)
- - CN: *.hobbs-family.com will not be checked or updated (config file cert_path blank)
+ - CN: *.mydomain.com will not be checked or updated (config file cert_path blank)
+ - CN: *.myseconddomain.com will not be checked or updated (config file cert_path blank)
 
 CNs to check/update:
 
