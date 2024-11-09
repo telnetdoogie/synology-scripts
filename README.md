@@ -3,7 +3,7 @@ A collection of scripts I use on my synology NAS
 
 ---
 
-### [Check Certs](./check_certs.md)
+### [Check (and Update) Synology SSL Certs](./check_certs.md)
 
 Check certificates deployed to synology NAS against (mulitple) renewed certificates
 
