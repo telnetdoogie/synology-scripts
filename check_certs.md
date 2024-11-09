@@ -1,4 +1,4 @@
-# Check Certs
+# Check (and Update) Synology SSL Certs
 
 [check_certs.sh](./check_certs.sh)
 
