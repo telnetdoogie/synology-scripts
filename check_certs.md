@@ -136,7 +136,7 @@ After the certificate update, you'll see the "check" run one more time... Any pr
 Only additional services where mismatches occured will be restarted.
 
 
-### Downloading
+## Downloading
 
 * ssh into the synology as a user with `sudo` rights
 * download the script:
@@ -147,3 +147,17 @@ sudo wget -O check_certs.sh https://raw.githubusercontent.com/telnetdoogie/synol
 ```
 sudo chmod +x check_certs.sh
 ```
+
+## Scheduling the script
+
+Once you're comfortable with the script, you can use the Synology Task Scheduler to execute it as frequently as you'd like.
+
+Don't forget in your scheduled task that you'll need to `cd` to where the config file is in order for things to run unattended. Here's my scheduled task:
+
+```bash
+cd /volume1/scripts
+bash /volume1/scripts/check_certs.sh --update
+```
+* Run as: root
+* Schedule: Daily, at midnight
+* My config file and script are in `/volume1/scripts`
