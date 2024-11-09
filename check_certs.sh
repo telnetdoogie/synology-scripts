@@ -9,23 +9,37 @@ readonly CERT_FILE="cert.pem"
 declare -A cert_map # a map of CertID:CN that already exist
 declare -a check_cns # CNs / Certs we will check or update
 declare -A config_map # map of config entries to paths
+declare -a services_to_restart # Packages that will need to be restarted
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' 
-UPDATE_MISMATCHES=false
+UPDATE=false # this defaults to check-only mode
+CHANGES_MADE=false # used to track if changes were made.
+########
+# User can change the paramter below if desired for testin
+NO_OVERWRITE=false #set this to true for a dry-run
+########
+
+
 
 # Give example usage
 usage() {
-    echo
-    echo "Usage: sudo $0 "
-    echo
-    exit 1
+	terminate "Usage: sudo $0 [--update] \n   pass --update to update mismatched certs\n   pass no options to just check files"
+}
+
+show_title() {
+	echo
+	echo "SSL Certificate Checker / Updater"
+	echo "=================================="
+	echo "(c) telnetdoogie 2024"
+	echo "https://github.com/telnetdoogie/synology-scripts/blob/main/check_certs.md"
+	echo
 }
 
 # Terminate with error message
 terminate() {
     echo
-    echo "$1"
+    echo -e "$1"
     echo
     exit "${2:-1}"
 }
@@ -139,37 +153,50 @@ read_config_file() {
 
 
 # Ensure the script is run as root
-if [[ $EUID -ne 0 ]]; then
-   usage
-fi
+check_root_privileges() {
+	if [[ $EUID -ne 0 ]]; then
+	   usage
+	fi
+}
+
+# Set update to true if parameter passed
+check_update_parameter(){
+	if [[ "$1" == "--update" ]]; then
+		UPDATE=true
+	fi
+}
 
 
 # build entries in the cert_map array for certificate ID and cert name (CN) from existing certs
-echo "Checking for Installed Certificates..."
-echo
+check_installed_certs() {
 
-while IFS= read -r certCode; do
-    cert_path="$ARCHIVE_PATH/$certCode/cert.pem"
-    
-    # Extract the CN (Common Name) from the certificate file
-    if [[ -f "$cert_path" ]]; then
-        cn=$(get_cert_cn "$cert_path")
-        if [[ -n "$cn" ]]; then
-            echo "  cert ID: $certCode  has CN: $cn"
-            cert_map["$certCode"]="$cn"
-        else
-            terminate "Warning: CN not found in $cert_path"
-        fi
-    else
-        terminate "Warning: Certificate file $cert_path not found"
-    fi
-done < <(jq -r 'keys[]' "$INFO_FILE")
+	echo "Checking for Installed Certificates..."
+	echo
 
-echo
-if [[ ${#cert_map[@]} -eq 0 ]]; then
-    terminate "No configured certificates found"
-fi
+	while IFS= read -r certCode; do
+		cert_path="$ARCHIVE_PATH/$certCode/cert.pem"
+		
+		# Extract the CN (Common Name) from the certificate file
+		if [[ -f "$cert_path" ]]; then
+			cn=$(get_cert_cn "$cert_path")
+			if [[ -n "$cn" ]]; then
+				echo "  cert ID: $certCode  has CN: $cn"
+				cert_map["$certCode"]="$cn"
+			else
+				terminate "Warning: CN not found in $cert_path"
+			fi
+		else
+			terminate "Warning: Certificate file $cert_path not found"
+		fi
+	done < <(jq -r 'keys[]' "$INFO_FILE")
 
+	echo
+	if [[ ${#cert_map[@]} -eq 0 ]]; then
+		terminate "No configured certificates found"
+	fi
+}
+
+# Function to output a line for a specific folder, coloring RED if mismatched and GREEN if correct
 output_folder_check_md5(){
 	local folder="$1"
 	local check_md5="$2"
@@ -185,6 +212,22 @@ output_folder_check_md5(){
 	fi
 }
 
+# Function to overwrite a folder's certificates with updated certs. Takes the folder and the CN as inputs
+overwrite_certificates(){
+	local dest_folder=$1
+	if [[ "$NO_OVERWRITE" == "true" ]]; then
+		mkdir -p ./test_certs
+		dest_folder="./test_certs"
+	fi
+	local source_folder=$2
+	if ! cp "$source_folder/"{cert,chain,fullchain,privkey}.pem "$dest_folder/" && \
+		chown root:root "$dest_folder/"{cert,chain,fullchain,privkey}.pem && \
+		chmod 400 "$dest_folder/"{cert,chain,fullchain,privkey}.pem; then
+		terminate "Error copying, chowning, and chmoding certificates in $dest_folder"
+	fi
+	CHANGES_MADE=true
+}
+
 
 # Function to iterate over the list of folders for a given certCode and CN
 check_cert_folders() {
@@ -192,6 +235,7 @@ check_cert_folders() {
     local cn="$2"
     local count=0
 	local mismatch_count=0
+	local user_cert_folder="${config_map["$cn"]}"
 	local updated_md5=$(md5sum "${config_map["$cn"]}/${CERT_FILE}" | awk '{print $1}') 
 
     echo "Checking package cert folders for cert ID: $certCode, CN: $cn..."
@@ -203,6 +247,10 @@ check_cert_folders() {
 			output_folder_check_md5 "$PKGS_PATH/$pkg_folder" "$updated_md5"
 			if [[ $? -eq 1 ]]; then
 				((mismatch_count++))
+				if [[ "$UPDATE" == "true" ]]; then
+					services_to_restart+=("${pkg_folder%%/*}")  # the %%/* here will get the top-level Folder (the package name)
+					overwrite_certificates "${PKGS_PATH}/${pkg_folder}" "$user_cert_folder"
+				fi			
 			fi
 		fi
     done < <(jq -r --arg certCode "$certCode" '.[$certCode] | .services[] | select(.isPkg == true) | "\(.subscriber)/\(.service)"' "$INFO_FILE")
@@ -221,7 +269,12 @@ check_cert_folders() {
             ((count++))
 			output_folder_check_md5 "$CERT_PATH/$cert_folder" "$updated_md5"
 			if [[ $? -eq 1 ]]; then
-                ((mismatch_count++))
+				if [[ "$UPDATE" == "true" ]]; then
+					((mismatch_count++))
+				    # There's something to restart here, but it's never worked for me on 7.2
+					# Would need to add a 'services to restart' specifically for these kinds of services...
+					overwrite_certificates "${CERT_PATH}/${cert_folder}" "$user_cert_folder"
+				fi
             fi
         fi
     done < <(jq -r --arg certCode "$certCode" '.[$certCode] | .services[] | select(.isPkg == false) | "\(.subscriber)/\(.service)"' "$INFO_FILE")
@@ -229,6 +282,60 @@ check_cert_folders() {
     echo " ($count found, $mismatch_count mismatches)"
     echo
 }
+
+# restarts packages needing to be restarted
+restart_packages(){	
+	echo "Finishing up..."
+	echo
+	if [[ "$UPDATE" == "true" ]]; then
+		if [[ "$CHANGES_MADE" == "true" ]]; then
+			# gen-all
+			echo "Running \"synow3tool --gen-all\" (can take some time)..."
+			if ! /usr/syno/bin/synow3tool --gen-all ; then
+				echo "synow3tool --gen-all failed"
+			fi
+
+			# pending packages
+			for pkg in "${services_to_restart[@]}"; do
+				/usr/syno/bin/synopkg is_onoff "$package" 1>/dev/null && \
+				echo "Restarting \"$pkg\"..." && \
+				/usr/syno/bin/synopkg restart "$pkg"
+			done
+			
+			# reloading nginx
+			echo "Reloading nginx..."
+			if ! /usr/syno/bin/synow3tool --nginx=reload ; then
+				echo "/usr/syno/bin/synow3tool --nginx=reload failed"
+			fi
+			
+			# restart DSM
+			echo "Restarting DSM..."
+			if ! /usr/syno/bin/synow3tool --restart-dsm-service; then
+				echo "/usr/syno/bin/synow3tool --restart-dsm-service failed"
+			fi
+		fi
+	fi
+}
+
+# Actually check certificates to be checked
+check_certificates(){
+	# For each CN to check, iterate folders and check certs
+	for certCode in "${!cert_map[@]}"; do
+		cn="${cert_map[$certCode]}"
+
+		if cn_exists_in_array "$cn" "${check_cns[@]}"; then
+			check_cert_folders "$certCode" "$cn"
+		fi
+	done
+}
+
+
+#######################################################################################
+# Main flow of the program below
+show_title
+check_root_privileges
+check_update_parameter "$@"
+check_installed_certs
 
 # Check if the configuration file exists and act accordingly
 if [[ ! -f "$CONFIG_FILE" ]]; then
@@ -241,57 +348,24 @@ if [[ ${#check_cns[@]} -eq 0 ]]; then
 	terminate "Done... No Certificates to Check / Update."
 fi
 
-
-
-# For each CN to check, iterate folders and check certs
+#i Check Certificates
 echo "Checking for mismatched certificates..."
+check_certificates
 echo
-for certCode in "${!cert_map[@]}"; do
-    cn="${cert_map[$certCode]}"
 
-    if cn_exists_in_array "$cn" "${check_cns[@]}"; then
-        check_cert_folders "$certCode" "$cn"
-    fi
-done
+# If changes were made, recheck certs
+if [[ "$CHANGES_MADE" == "true" ]]; then
+	UPDATE=false
+	echo    "#####################################################################"
+	echo -e "Changes were made... re-checking certs... All below should show ${GREEN}green${NC}"
+	echo    "#####################################################################"
+	echo
+	check_certificates
+	UPDATE=true
+fi
 
+# Restart packages if necessary
+restart_packages
 
-
-
-#CURRENT_VER=$(md5sum "$1" | awk '{print $1}')
-#
-#declare -a allcerts
-#readarray -t syno_certs < <(find /usr/syno/etc/certificate/ -type f -name "cert.pem")
-#readarray -t local_certs < <(find /usr/local/etc/certificate/ -type f -name "cert.pem")
-#allcerts+=("${syno_certs[@]}")
-#allcerts+=("${local_certs[@]}")
-#declare -a certs_unmatching
-#
-#if [ ${#allcerts[@]} -eq 0 ]; then
-#  echo "No certificates found."
-#  exit 1
-#fi
-#
-#for dir in "${allcerts[@]}"; do
-#  THIS_VERSION=$(md5sum "$dir" | awk '{print $1}')
-#  if [[ "$CURRENT_VER" != "$THIS_VERSION" ]]; then
-#    certs_unmatching+=("$dir")
-#  fi
-#done
-#
-#if [ ${#certs_unmatching[@]} -eq 0 ]; then
-#  echo "All certificates match the current version."
-#else
-#  echo "The following folders have certs that do not match the current version:"
-#  for cert in "${certs_unmatching[@]}"; do
-#    dirname=$(dirname ${cert})
-#    echo
-#    echo "  - $dirname"
-#    if [ -f "$dirname/info" ]; then
-#      echo "    - Service    : $(cat "$dirname/info" | jq -r ".service")"
-#      echo "    - Subscriber : $(cat "$dirname/info" | jq -r ".subscriber")"
-#    else
-#      echo "    - (info file not found in $dirname)"
-#    fi
-#  done
-#fi
-#echo
+# All done
+terminate "Finished\n  " 0
