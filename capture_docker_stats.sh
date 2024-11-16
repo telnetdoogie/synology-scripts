@@ -3,6 +3,7 @@
 # Initialize variables
 CONTAINER_NAME=""
 VERBOSE=false
+STOPPED=false
 
 # Parse arguments
 for arg in "$@"; do
@@ -35,22 +36,26 @@ if [ -z "$CONTAINER_NAME" ]; then
 else
 	echo "Capturing Container '${CONTAINER_NAME}' stats to $LOG_FILE"
 fi
+
 # If verbose mode is enabled, also print to the screen
 if [ "$VERBOSE" = false ]; then
 	 echo " - add -v parameter to log to screen as well"
 fi
-echo "CTRL-C to stop."
+echo "CTRL-C to finish"
+
+# Capture CTRL-C to gracefully exit on the next iteration instead of abending
+trap 'STOPPED=true' SIGINT
 
 # Loop to capture CPU usage continually
-while true; do
+while [[ $STOPPED = false ]]; do
 	# Capture the current timestamp
 	TIMESTAMP=$(date --iso-8601=seconds)
 
-	# Get the JSON output for named container, or all containers
+	# Run docker stats in a subshell where SIGINT is ignored
 	if [ -z "$CONTAINER_NAME" ]; then
-		JSON=$(docker stats --format json --no-stream)
+		JSON=$(setsid docker stats --format json --no-stream)
 	else
-		JSON=$(docker stats "$CONTAINER_NAME" --format json --no-stream)
+		JSON=$(setsid docker stats "$CONTAINER_NAME" --format json --no-stream)
 	fi
 
 	# Add the current timestamp to the JSON and format fields for logging
@@ -67,7 +72,7 @@ while true; do
 		.MemUsage = .MemUsage.Memory |
 	{dateTime, ID, Name, Container, CPUPerc, MemPerc, MemUsage, MemMax}
 	')
-
+	
 	# Write the JSON to the log file
 	echo "$UPDATED_JSON" >> "$LOG_FILE"
 
@@ -80,3 +85,4 @@ while true; do
 	sleep 0.25
 done
 
+echo "CTRL-C / SIGINT - Stopping."
