@@ -314,6 +314,8 @@ restart_packages(){
 				echo "/usr/syno/bin/synow3tool --restart-dsm-service failed"
 			fi
 		fi
+	else
+		echo "No changes made. Run with --update to make changes."
 	fi
 }
 
