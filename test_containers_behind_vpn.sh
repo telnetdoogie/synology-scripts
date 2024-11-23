@@ -25,7 +25,13 @@ output_error(){
 	COL=$RED
 	echo -e "${COL}${MESSAGE}${NC}"
 }
-
+echo
+echo    "========================================================================="
+echo -e "This script validates that your containers behind a VPN are"
+echo -e " correctly using the VPN for OUTBOUND traffic."
+echo -e " - A ${RED}RED${NC} IP address means the container's egress is the same as your host"
+echo -e " - A ${GRN}GREEN${NC} IP address means the container's egress is across the VPN"
+echo    "========================================================================="
 echo
 echo "This hosts public IP:"
 PUBLIC_IP=$(wget -q -O - http://api.ipify.org)
