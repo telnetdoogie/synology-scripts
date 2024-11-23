@@ -42,7 +42,7 @@ for CONTAINER in "${CONTAINERS[@]}"; do
 	echo -e "Checking ${BOLD}${CONTAINER}${NC}..."
 
 	if ! docker container ps | grep ${CONTAINER} >/dev/null 2>&1; then
-		output_error "Container ${CONTAINER} not running"
+		output_error "  - Container not running"
 		echo
 		continue
 	fi
