@@ -4,7 +4,7 @@
 # No commas between items, each item in quotes.
 # eg: CONTAINERS=("prowlarr" "transmission")
 
-CONTAINERS=("prowlarr" "transmission")
+CONTAINERS=("poop" "prowlarr" "transmission")
 
 
 # -----------------------------------------------------------
@@ -40,6 +40,13 @@ echo
 
 for CONTAINER in "${CONTAINERS[@]}"; do
 	echo -e "Checking ${BOLD}${CONTAINER}${NC}..."
+
+	if ! docker container ps | grep ${CONTAINER} >/dev/null 2>&1; then
+		output_error "Container ${CONTAINER} not running"
+		echo
+		continue
+	fi
+
 	echo " External IP: "
 	EXT_IP_GRABBED=false
 
@@ -66,7 +73,7 @@ for CONTAINER in "${CONTAINERS[@]}"; do
 	fi
 
 	if docker exec "${CONTAINER}" which ping >/dev/null 2>&1; then
-		echo " Check internet egress:"
+		echo " Check internet connectivity:"
 		if docker exec "${CONTAINER}" ping -c 2 -W 1 8.8.8.8 > /dev/null 2>&1; then
 			output "  - OK" 
 		else
@@ -80,9 +87,8 @@ for CONTAINER in "${CONTAINERS[@]}"; do
 			output_error "  - FAIL"
 		fi
 	else
-		echo " Check internet egress:"
+		echo " Check internet connectivity:"
 		output_error "  - Ping, Name resolution check not possible, ping not availabe in container" "false"
 	fi
 	echo
 done
-echo
