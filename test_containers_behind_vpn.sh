@@ -1,4 +1,14 @@
 #!/bin/bash
+
+# Change this array to hold the containers you want to check
+# No commas between items, each item in quotes.
+# eg: CONTAINERS=("prowlarr" "transmission")
+
+CONTAINERS=("prowlarr" "transmission")
+
+
+# -----------------------------------------------------------
+# No need to change anything below here
 GRN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
@@ -19,8 +29,6 @@ echo "This hosts public IP:"
 PUBLIC_IP=$(wget -q -O - http://api.ipify.org)
 output "  - $PUBLIC_IP" "true"
 echo
-
-CONTAINERS=("prowlarr" "transmission")
 
 for CONTAINER in "${CONTAINERS[@]}"; do
 echo -e "Checking ${BOLD}${CONTAINER}${NC}..."
