@@ -4,7 +4,7 @@
 # No commas between items, each item in quotes.
 # eg: CONTAINERS=("prowlarr" "transmission")
 
-CONTAINERS=("poop" "prowlarr" "transmission")
+CONTAINERS=("prowlarr" "transmission")
 
 
 # -----------------------------------------------------------
