@@ -26,15 +26,28 @@ Update synology to the latest version of `docker-compose`
 #### `removeAppleHiddenFiles.sh` 
 - Deletes Apple 'hidden' files from the `/volume1/Media` folder (edit to add more folders)
 
+---
+
 #### `showports.sh` 
 - Show LISTEN ports in use on synology and which containers use them, for easily coming up with new unique ports to use
 
+---
+
 #### `showComtainerLoggers.sh` 
 - Iterate docker containers and show which logger is configured per container (prep for upgrading docker)
+
+---
 
 #### `test_containers_behind_vpn.sh` 
 - For containers that are protected behind a VPN, validate their public IP is different than your host, and check for connectivity and DNS resolution.
   - edit the script to define containers to check, like `CONTAINERS=("prowlarr" "transmission")` 
 
+---
+
+#### `capture_docker_stats.sh` 
+- Capture the CPU / Memory stats of running containers continually and store results as JSON for later analysis
+- This is useful for watching the resource usage of containers (or a particular container) for troubleshooting.
+
+run `capture_docker_stats.sh {containername} {-v}` - omitting `containername` defaults to all containers. `-v` outputs to screen as well as file.
 
 
