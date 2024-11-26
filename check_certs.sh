@@ -1,13 +1,5 @@
 #!/bin/bash
 
-########
-# Set this to false to NOT update VPNServer keys automatically
-VPN_REGEN=true
-# Set to true if desired for testing; dry-run
-NO_OVERWRITE=false
-########
-
-###################################################################
 
 readonly CERT_PATH=/usr/syno/etc/certificate
 readonly PKGS_PATH=/usr/local/etc/certificate
@@ -24,10 +16,17 @@ RED='\033[0;31m'
 NC='\033[0m'
 UPDATE=false                    # this defaults to check-only mode
 CHANGES_MADE=false              # used to track if changes were made.
+VPN_REGEN=true                  # defaults to true to update VPNCenter certs
+NO_OVERWRITE=false              # will get set to true for a dry-run
 
 # Give example usage
 usage() {
-    terminate "Usage: sudo $0 [--update] \n   pass --update to update mismatched certs\n   pass no options to just check files"
+    terminate "Usage: sudo $0 [--update] [--dry-run] [--novpnregen] \n
+       --update to update mismatched certs\n
+       --dry-run to emulate update with no modified files\n
+       --novpnregen to skip updating VPNCenter certificates\n
+        \n
+       default (without --update) will just check files and make no change"
 }
 
 show_title() {
@@ -161,10 +160,27 @@ check_root_privileges() {
 }
 
 # Set update to true if parameter passed
-check_update_parameter() {
+check_parameters() {
     if [[ "$1" == "--update" ]]; then
         UPDATE=true
     fi
+    for arg in "$@"; do
+        case "$arg" in
+            --update)
+                UPDATE=true
+                ;;
+            --novpnregen)
+                VPN_REGEN=false
+                ;;
+            --dry-run)
+                NO_OVERWRITE=true
+                ;;
+            *)
+                echo "Unknown argument passed: $arg"
+                exit 1
+                ;;
+        esac
+    done
 }
 
 # build entries in the cert_map array for certificate ID and cert name (CN) from existing certs
@@ -300,7 +316,7 @@ restart_packages() {
 
             # regenerate VPNCenter certs if VPNCenter was updated
             # fixes https://github.com/telnetdoogie/synology-scripts/issues/4
-            if [[ "$VPN_REGEN" == "true" ]]; then
+            if [[ "$VPN_REGEN" == "true" && "$NO_OVERWRITE" == "false" ]]; then
                 if exists_in_array "VPNCenter" "${services_to_restart[@]}"; then
                     echo "Updating VPNCenter Certs..."
                     /var/packages/VPNCenter/target/hook/CertReload.sh copy_cert_only
@@ -347,7 +363,7 @@ check_certificates() {
 # Main flow of the program below
 show_title
 check_root_privileges
-check_update_parameter "$@"
+check_parameters "$@"
 check_installed_certs
 
 # Check if the configuration file exists and act accordingly

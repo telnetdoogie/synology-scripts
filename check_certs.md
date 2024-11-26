@@ -135,6 +135,22 @@ After the certificate update, you'll see the "check" run one more time... Any pr
 
 Only additional services where mismatches occured will be restarted.
 
+### Other Options
+#### VPNCenter Certificates
+By default, if you have VPNCenter installed, this script will also regenerate your VPN Certificates automatically if certs are updated for the VPNCenter application.
+If you DO NOT WANT VPN Center certificates updated (since this may mean that new VPN client files may need to be regenerated if you include certs in your client config), 
+add the additional option:
+
+`sudo ./check_certs.sh --update --novpnregen`
+
+#### Dry-Run / Do not modify files
+To run the script without overwriting any files, and just place certs in a test folder `./test_certs` (relative to where you're running the script from)
+pass the additional option:
+
+`sudo ./check_certs.sh --update --dry-run`
+
+In this mode, actual certificates will not be updated, but **Packages that would have been affected with an updated cert will still be restarted** (This gives a chance to check for functionality of package restarts etc and is good for testing and debugging)
+
 
 ## Downloading
 
