@@ -235,12 +235,13 @@ overwrite_certificates() {
     local dest_folder=$1
     if [[ "$NO_OVERWRITE" == "true" ]]; then
         echo "Dry Run - not updating $dest_folder"
-    fi
-    local source_folder=$2
-    if ! cp "$source_folder/"{cert,chain,fullchain,privkey}.pem "$dest_folder/" &&
-        chown root:root "$dest_folder/"{cert,chain,fullchain,privkey}.pem &&
-        chmod 400 "$dest_folder/"{cert,chain,fullchain,privkey}.pem; then
-        terminate "Error with copy, chown, or chmod certificates in $dest_folder"
+    else
+        local source_folder=$2
+        if ! cp "$source_folder/"{cert,chain,fullchain,privkey}.pem "$dest_folder/" &&
+            chown root:root "$dest_folder/"{cert,chain,fullchain,privkey}.pem &&
+            chmod 400 "$dest_folder/"{cert,chain,fullchain,privkey}.pem; then
+            terminate "Error with copy, chown, or chmod certificates in $dest_folder"
+        fi
     fi
     CHANGES_MADE=true
 }
