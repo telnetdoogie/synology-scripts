@@ -32,4 +32,9 @@ Update synology to the latest version of `docker-compose`
 #### `showComtainerLoggers.sh` 
 - Iterate docker containers and show which logger is configured per container (prep for upgrading docker)
 
+#### `test_containers_behind_vpn.sh` 
+- For containers that are protected behind a VPN, validate their public IP is different than your host, and check for connectivity and DNS resolution.
+  - edit the script to define containers to check, like `CONTAINERS=("prowlarr" "transmission")` 
+
+
 
