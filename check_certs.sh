@@ -234,8 +234,7 @@ output_folder_check_md5() {
 overwrite_certificates() {
     local dest_folder=$1
     if [[ "$NO_OVERWRITE" == "true" ]]; then
-        mkdir -p ./test_certs
-        dest_folder="./test_certs"
+        echo "Dry Run - not updating $dest_folder"
     fi
     local source_folder=$2
     if ! cp "$source_folder/"{cert,chain,fullchain,privkey}.pem "$dest_folder/" &&
@@ -309,38 +308,68 @@ restart_packages() {
     if [[ "$UPDATE" == "true" ]]; then
         if [[ "$CHANGES_MADE" == "true" ]]; then
             # gen-all
-            echo "Running \"synow3tool --gen-all\" (can take some time)..."
-            if ! /usr/syno/bin/synow3tool --gen-all; then
-                echo "synow3tool --gen-all failed"
+            if [[ "$NO_OVERWRITE" == "false" ]]; then
+                echo "Running \"synow3tool --gen-all\" (can take some time)..."
+                if ! /usr/syno/bin/synow3tool --gen-all; then
+                    echo "synow3tool --gen-all failed"
+                fi
+            else
+                echo "Running \"synow3tool --gen-all\" (dry run, not executing)..."
+                sleep 3
             fi
+
 
             # regenerate VPNCenter certs if VPNCenter was updated
             # fixes https://github.com/telnetdoogie/synology-scripts/issues/4
-            if [[ "$VPN_REGEN" == "true" && "$NO_OVERWRITE" == "false" ]]; then
-                if exists_in_array "VPNCenter" "${services_to_restart[@]}"; then
-                    echo "Updating VPNCenter Certs..."
-                    /var/packages/VPNCenter/target/hook/CertReload.sh copy_cert_only
+            if exists_in_array "VPNCenter" "${services_to_restart[@]}"; then
+                if [[ "$VPN_REGEN" == "true" ]]; then
+                    if [[ "$NO_OVERWRITE" == "false" ]]; then
+                        echo "Updating VPNCenter Certs..."
+                        /var/packages/VPNCenter/target/hook/CertReload.sh copy_cert_only
+                    else
+                        echo "Updating VPNCenter Certs (dry run, no files changed)..."
+                        sleep 3
+                    fi
+                else
+                    echo "Skipping VPNCenter Certs..."
                 fi
             fi
 
             # pending packages
             for pkg in "${services_to_restart[@]}"; do
-                /usr/syno/bin/synopkg is_onoff "$pkg" 1>/dev/null &&
+                if [[ "$NO_OVERWRITE" == "false" ]]; then
+                    /usr/syno/bin/synopkg is_onoff "$pkg" 1>/dev/null &&
                     echo "Restarting \"$pkg\"..." &&
                     /usr/syno/bin/synopkg restart "$pkg"
+                else
+                    echo "Restarting \"$pkg\"... (dry run, not executing)..."
+                    sleep 3
+                fi
             done
 
             # reloading nginx
-            echo "Reloading nginx..."
-            if ! /usr/syno/bin/synow3tool --nginx=reload; then
-                echo "/usr/syno/bin/synow3tool --nginx=reload failed"
+            if [[ "$NO_OVERWRITE" == "false" ]]; then
+                echo "Reloading nginx..."
+                if ! /usr/syno/bin/synow3tool --nginx=reload; then
+                    echo "/usr/syno/bin/synow3tool --nginx=reload failed"
+                fi
+            else
+                echo "Reloading nginx... (dry run, not executing)"
+                sleep 3
             fi
 
+
             # restart DSM
-            echo "Restarting DSM..."
-            if ! /usr/syno/bin/synow3tool --restart-dsm-service; then
-                echo "/usr/syno/bin/synow3tool --restart-dsm-service failed"
+            if [[ "$NO_OVERWRITE" == "false" ]]; then
+                echo "Restarting DSM..."
+                if ! /usr/syno/bin/synow3tool --restart-dsm-service; then
+                    echo "/usr/syno/bin/synow3tool --restart-dsm-service failed"
+                fi
+            else
+                echo "Restarting DSM... (dry run, not executing)"
+                sleep 3
             fi
+
         fi
     else
         echo "No changes made. Run with --update to make changes."

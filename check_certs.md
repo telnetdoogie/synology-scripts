@@ -144,12 +144,11 @@ add the additional option:
 `sudo ./check_certs.sh --update --novpnregen`
 
 #### Dry-Run / Do not modify files
-To run the script without overwriting any files, and just place certs in a test folder `./test_certs` (relative to where you're running the script from)
-pass the additional option:
+To run the script without overwriting any files or restarting any apps, pass this additional option. 
 
 `sudo ./check_certs.sh --update --dry-run`
 
-In this mode, actual certificates will not be updated, but **Packages that would have been affected with an updated cert will still be restarted** (This gives a chance to check for functionality of package restarts etc and is good for testing and debugging)
+In this mode, actual certificates will not be updated, and Packages that would have been affected with an updated cert will not be restarted (This gives a chance to check for what WOULD change and is good for debugging)
 
 
 ## Downloading
