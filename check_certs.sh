@@ -325,14 +325,14 @@ restart_packages() {
             if exists_in_array "VPNCenter" "${services_to_restart[@]}"; then
                 if [[ "$VPN_REGEN" == "true" ]]; then
                     if [[ "$NO_OVERWRITE" == "false" ]]; then
-                        echo "Updating VPNCenter Certs..."
+                        echo "VPNCenter certificate regeneration..."
                         /var/packages/VPNCenter/target/hook/CertReload.sh copy_cert_only
                     else
-                        echo "Updating VPNCenter Certs (dry run, no files changed)..."
+                        echo "VPNCenter certificate regeneration (dry run, no files changed)..."
                         sleep 3
                     fi
                 else
-                    echo "Skipping VPNCenter Certs..."
+                    echo "Skipping VPNCenter certificate regeneration..."
                 fi
             fi
 
