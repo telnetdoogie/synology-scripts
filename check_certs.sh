@@ -308,16 +308,19 @@ restart_packages() {
     echo
     if [[ "$UPDATE" == "true" ]]; then
         if [[ "$CHANGES_MADE" == "true" ]]; then
+
+            # I don't think this is actually needed; it will regen Reverse Proxy definitions
+            # and since no definitions change, an nginx reload should be all that's needed.
             # gen-all
-            if [[ "$NO_OVERWRITE" == "false" ]]; then
-                echo "Running \"synow3tool --gen-all\" (can take some time)..."
-                if ! /usr/syno/bin/synow3tool --gen-all; then
-                    echo "synow3tool --gen-all failed"
-                fi
-            else
-                echo "Running \"synow3tool --gen-all\" (dry run, not executing)..."
-                sleep 3
-            fi
+            #if [[ "$NO_OVERWRITE" == "false" ]]; then
+            #    echo "Running \"synow3tool --gen-all\" (can take some time)..."
+            #    if ! /usr/syno/bin/synow3tool --gen-all; then
+            #        echo "synow3tool --gen-all failed"
+            #    fi
+            #else
+            #    echo "Running \"synow3tool --gen-all\" (dry run, not executing)..."
+            #    sleep 3
+            #fi
 
 
             # regenerate VPNCenter certs if VPNCenter was updated
