@@ -1,8 +1,10 @@
 #!/bin/bash
 
 ########
-# User can change the parameter below if desired for testing
-NO_OVERWRITE=false #set this to true for a dry-run
+# Set this to false to NOT update VPNServer keys automatically
+VPN_REGEN=true
+# Set to true if desired for testing; dry-run
+NO_OVERWRITE=false
 ########
 
 ###################################################################
@@ -20,8 +22,8 @@ declare -a services_to_restart # Packages that will need to be restarted
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
-UPDATE=false             # this defaults to check-only mode
-CHANGES_MADE=false       # used to track if changes were made.
+UPDATE=false                    # this defaults to check-only mode
+CHANGES_MADE=false              # used to track if changes were made.
 
 # Give example usage
 usage() {
@@ -298,9 +300,11 @@ restart_packages() {
 
             # regenerate VPNCenter certs if VPNCenter was updated
             # fixes https://github.com/telnetdoogie/synology-scripts/issues/4
-            if exists_in_array "VPNCenter" "${services_to_restart[@]}"; then
-                echo "Updating VPNCenter Certs..."
-                /var/packages/VPNCenter/target/hook/CertReload.sh copy_cert_only
+            if [[ "$VPN_REGEN" == "true" ]]; then
+                if exists_in_array "VPNCenter" "${services_to_restart[@]}"; then
+                    echo "Updating VPNCenter Certs..."
+                    /var/packages/VPNCenter/target/hook/CertReload.sh copy_cert_only
+                fi
             fi
 
             # pending packages
