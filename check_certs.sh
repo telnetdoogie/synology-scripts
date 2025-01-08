@@ -11,9 +11,8 @@ declare -A cert_map            # a map of CertID:CN that already exist
 declare -a check_cns           # CNs / Certs we will check or update
 declare -A config_map          # map of config entries to paths
 declare -a services_to_restart # Packages that will need to be restarted
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m'
+GREEN='🟢 '
+RED='🔴 '
 UPDATE=false                    # this defaults to check-only mode
 CHANGES_MADE=false              # used to track if changes were made.
 VPN_REGEN=true                  # defaults to true to update VPNCenter certs
@@ -221,11 +220,11 @@ output_folder_check_md5() {
 
     if [[ "$check_md5" != "$this_md5" ]]; then
         # non-matching file
-        echo -e " - ${RED}${folder}${NC}"
+        echo " - ${RED}${folder}"
         return 1
     else
         # matching file
-        echo -e " - ${GREEN}${folder}${NC}"
+        echo " - ${GREEN}${folder}"
         return 0
     fi
 }
@@ -418,9 +417,9 @@ echo
 # If changes were made, recheck certs
 if [[ "$CHANGES_MADE" == "true" ]]; then
     UPDATE=false
-    echo "#####################################################################"
-    echo -e "Changes were made... re-checking certs... All below should show ${GREEN}green${NC}"
-    echo "#####################################################################"
+    echo "##################################################################"
+    echo "Changes were made... re-checking certs... All below should show ${GREEN}"
+    echo "##################################################################"
     echo
     check_certificates
     UPDATE=true
