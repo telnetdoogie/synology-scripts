@@ -287,8 +287,8 @@ check_cert_folders() {
             ((count++))
             output_folder_check_md5 "$CERT_PATH/$cert_folder" "$updated_md5"
             if [[ $? -eq 1 ]]; then
+                ((mismatch_count++))
                 if [[ "$UPDATE" == "true" ]]; then
-                    ((mismatch_count++))
                     # There's something to restart here, but it's never worked for me on 7.2
                     # Would need to add a 'services to restart' specifically for these kinds of services...
                     overwrite_certificates "${CERT_PATH}/${cert_folder}" "$user_cert_folder"
