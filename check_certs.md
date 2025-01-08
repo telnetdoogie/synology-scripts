@@ -86,43 +86,40 @@ Checking package cert folders for cert ID: okVdDh, CN: *.mydomain.com...
  (0 found, 0 mismatches)
 
 Checking non-package cert folders for cert ID: okVdDh, CN: *.mydomain.com...
- - /usr/syno/etc/certificate/ReverseProxy/fce4c5b9-5e61-4eb5-93b0-02a1ae4bb826
- - /usr/syno/etc/certificate/ReverseProxy/e2d91896-c2f1-47b6-96b6-cf3b8c626b90
- - /usr/syno/etc/certificate/ReverseProxy/8f3339c2-3460-460b-bdcc-bc40e61fd9ee
+ - 🟢 /usr/syno/etc/certificate/ReverseProxy/fce4c5b9-5e61-4eb5-93b0-02a1ae4bb826
+ - 🟢 /usr/syno/etc/certificate/ReverseProxy/e2d91896-c2f1-47b6-96b6-cf3b8c626b90
+ - 🟢 /usr/syno/etc/certificate/ReverseProxy/8f3339c2-3460-460b-bdcc-bc40e61fd9ee
  (3 found, 0 mismatches)
 
 Checking package cert folders for cert ID: auLTvE, CN: *.myseconddomain.com...
- - /usr/local/etc/certificate/ReplicationService/snapshot_receiver
- - /usr/local/etc/certificate/LogCenter/pkg-LogCenter
- - /usr/local/etc/certificate/ScsiTarget/pkg-scsi-plugin-server
- (3 found, 0 mismatches)
+ - 🔴 /usr/local/etc/certificate/LogCenter/pkg-LogCenter
+ - 🔴 /usr/local/etc/certificate/ScsiTarget/pkg-scsi-plugin-server
+ - 🔴 /usr/local/etc/certificate/SynologyDrive/SynologyDrive
+ (3 found, 3 mismatches)
 
 Checking non-package cert folders for cert ID: auLTvE, CN: *.myseconddomain.com...
- - /usr/syno/etc/certificate/ReverseProxy/b9839a46-676f-43cf-9fc8-3663dc87d37d
- - /usr/syno/etc/certificate/kmip/kmip
- - /usr/syno/etc/certificate/smbftpd/ftpd
- - /usr/syno/etc/certificate/ReverseProxy/bdad0b43-ddeb-404e-a8cf-a0ff787d6f4c
- - /usr/syno/etc/certificate/ReverseProxy/13fe1307-7114-4b42-97f7-b8167fbb9438
- - /usr/syno/etc/certificate/ReverseProxy/4c70a5e2-8380-447a-ada6-053f284be873
- - /usr/syno/etc/certificate/ReverseProxy/4eb86f9e-880d-47e7-9a49-e473d4383dc3
- - /usr/syno/etc/certificate/ReverseProxy/06e7ddea-0ce5-40c0-8464-0dfd444210fe
- - /usr/syno/etc/certificate/ReverseProxy/0f611775-5c33-498f-9e84-4264a6bca8f0
- - /usr/syno/etc/certificate/ReverseProxy/150a43fd-b74e-4271-a286-4df41e245ba2
- - /usr/syno/etc/certificate/ReverseProxy/e6d25084-7f5c-426e-ae75-6ec22fe15d95
- - /usr/syno/etc/certificate/ReverseProxy/04fdc8fd-6d63-4ff9-b448-fcb697b0efd7
- - /usr/syno/etc/certificate/ReverseProxy/209efc5f-5ff1-4f41-b34a-afa8d843814b
- - /usr/syno/etc/certificate/ReverseProxy/4679a920-1a13-47e1-a0ec-0b6dca22d75a
- - /usr/syno/etc/certificate/ReverseProxy/7806549a-25bc-417a-8e05-0b2bfd445c02
- - /usr/syno/etc/certificate/ReverseProxy/9e5cb385-bb66-4c96-abba-67f982bb6d1c
- - /usr/syno/etc/certificate/ReverseProxy/733a2fb8-5007-4f52-9c63-5d50bd38490a
- - /usr/syno/etc/certificate/system/FQDN
- - /usr/syno/etc/certificate/system/default
- (19 found, 0 mismatches)
+ - 🔴 /usr/syno/etc/certificate/kmip/kmip
+ - 🔴 /usr/syno/etc/certificate/smbftpd/ftpd
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/b9839a46-676f-43cf-9fc8-3663dc87d37d
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/ba51a915-35ef-4d63-b6ac-4c1fb7820275
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/bdad0b43-ddeb-404e-a8cf-a0ff787d6f4c
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/4c70a5e2-8380-447a-ada6-053f284be873
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/4eb86f9e-880d-47e7-9a49-e473d4383dc3
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/06e7ddea-0ce5-40c0-8464-0dfd444210fe
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/0f611775-5c33-498f-9e84-4264a6bca8f0
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/e6d25084-7f5c-426e-ae75-6ec22fe15d95
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/04fdc8fd-6d63-4ff9-b448-fcb697b0efd7
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/209efc5f-5ff1-4f41-b34a-afa8d843814b
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/25352c5b-7a82-42ef-bd39-fad36b7203a2
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/4679a920-1a13-47e1-a0ec-0b6dca22d75a
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/7806549a-25bc-417a-8e05-0b2bfd445c02
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/9e5cb385-bb66-4c96-abba-67f982bb6d1c
+ - 🔴 /usr/syno/etc/certificate/ReverseProxy/733a2fb8-5007-4f52-9c63-5d50bd38490a
+ - 🔴 /usr/syno/etc/certificate/system/FQDN
+ - 🔴 /usr/syno/etc/certificate/system/default
+ (19 found, 19 mismatches)
 
 ```
-
-( _I can't show it in Github markdown, but each cert location is colored_ $${\color{green}Green}$$ _or_ $${\color{red}Red}$$ _to show whether the certificate matches or is mismatched._)
-
 ## Updating your certificates
 
 When you have certificates that show as red and need to be updated, you can run the script with
