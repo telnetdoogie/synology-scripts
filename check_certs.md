@@ -10,6 +10,20 @@ It needs to be run as root (`sudo`) in order to access the synology's certificat
 
 _*** This script was recently rewritten from scratch and can now support multiple generated certificates with different common-names.***_
 
+## A note about importing certificates into DSM (first time import)
+
+This script will only UPDATE certificates that were set up in DSM; It cannot add new certs not yet recognized by DSM. Having said that, it's important to set these certs up correctly the first time you import them in DSM.
+
+If you have certs from somewhere like **LetsEncrypt**, you will have a few files. It is not completely intuitive based on the names; in order to have this script work consistently, the correct files must be initially uploaded into DSM. Things can _appear_ to work with the incorrect files uploaded, however, you should upload the following files into DSM when prompted:
+
+| DSM Form Field | File to Upload |
+| ----------------- | --------- |
+| **Private Key** | `privkey.pem` |
+|  **Certificate** | `cert.pem` |
+| **Intermediate certificate** | -leave empty- |
+
+DSM certs **CAN** work if you upload the `fullchain.pem` as the Certificate, and the `chain.pem` as the Intermediate, as is suggested in some LetsEncrypt documentation as well as the README that sits alongside your certs... However, future reverse proxy updates and DSM changes will become VERY slow as DSM reconstructs its own cert files for you, AND the script provided here will no longer work. So... Don't import an intermediate certificate. You'll thank me later :)
+
 ## First time run, Configuration File
 
 The first time you run the script, it will generate a `cert_config.json` file for you in the same folder. This will contain entries for each CN (Common Name) certificate that's currently configured on your Synology. Here's my example:
