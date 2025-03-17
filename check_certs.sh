@@ -14,7 +14,7 @@ declare -a services_to_restart # Packages that will need to be restarted
 GREEN='🟢 '
 RED='🔴 '
 UPDATE=false                    # this defaults to check-only mode
-CHANGES_MADE=false              # used to track if changes were made.
+CHANGES_MADE=true              # used to track if changes were made.
 VPN_REGEN=true                  # defaults to true to update VPNCenter certs
 NO_OVERWRITE=false              # will get set to true for a dry-run
 
@@ -295,7 +295,7 @@ check_cert_folders() {
                 fi
             fi
         fi
-    done < <(jq -r --arg certCode "$certCode" '.[$certCode] | .services[] | select(.isPkg == false) | "\(.subscriber)/\(.service)"' "$INFO_FILE")
+    done < <( (echo "_archive/$certCode"; jq -r --arg certCode "$certCode" '.[$certCode] | .services[] | select(.isPkg == false) | "\(.subscriber)/\(.service)"' "$INFO_FILE") )
 
     echo " ($count found, $mismatch_count mismatches)"
     echo
@@ -311,15 +311,15 @@ restart_packages() {
             # I don't think this is actually needed; it will regen Reverse Proxy definitions
             # and since no definitions change, an nginx reload should be all that's needed.
             # gen-all
-            #if [[ "$NO_OVERWRITE" == "false" ]]; then
-            #    echo "Running \"synow3tool --gen-all\" (can take some time)..."
-            #    if ! /usr/syno/bin/synow3tool --gen-all; then
-            #        echo "synow3tool --gen-all failed"
-            #    fi
-            #else
-            #    echo "Running \"synow3tool --gen-all\" (dry run, not executing)..."
-            #    sleep 3
-            #fi
+            if [[ "$NO_OVERWRITE" == "false" ]]; then
+                echo "Running \"synow3tool --gen-all\" (can take some time)..."
+                if ! /usr/syno/bin/synow3tool --gen-all; then
+                    echo "synow3tool --gen-all failed"
+                fi
+            else
+                echo "Running \"synow3tool --gen-all\" (dry run, not executing)..."
+                sleep 3
+            fi
 
 
             # regenerate VPNCenter certs if VPNCenter was updated
