@@ -20,7 +20,7 @@ If you have certs from somewhere like **LetsEncrypt**, you will have a few files
 | ----------------- | --------- |
 | **Private Key** | `privkey.pem` |
 | **Certificate** | `fullchain.pem` |
-| **Intermediate certificate** | --leave blank*-- |
+| **Intermediate certificate** | --*leave blank*-- |
 
 DSM certs **CAN** work if you upload a mixture of `cert.pem` and `chain.pem` as the Cert and Intermediate Certs... However, future reverse proxy updates and DSM changes will become VERY slow as DSM reconstructs its own cert files for you, AND the script provided here will no longer work. So... Don't import the wrong files. 
 
