@@ -14,7 +14,7 @@ declare -a services_to_restart # Packages that will need to be restarted
 GREEN='🟢 '
 RED='🔴 '
 UPDATE=false                    # this defaults to check-only mode
-CHANGES_MADE=true              # used to track if changes were made.
+CHANGES_MADE=false              # used to track if changes were made.
 VPN_REGEN=true                  # defaults to true to update VPNCenter certs
 NO_OVERWRITE=false              # will get set to true for a dry-run
 
