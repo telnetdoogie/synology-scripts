@@ -19,10 +19,10 @@ If you have certs from somewhere like **LetsEncrypt**, you will have a few files
 | DSM Form Field | File to Upload |
 | ----------------- | --------- |
 | **Private Key** | `privkey.pem` |
-| **Certificate** | `fullchain.pem` |
+| **Certificate** | `cert.pem` |
 | **Intermediate certificate** | --*leave blank*-- |
 
-DSM certs **CAN** work if you upload a mixture of `cert.pem` and `chain.pem` as the Cert and Intermediate Certs... However, future reverse proxy updates and DSM changes will become VERY slow as DSM reconstructs its own cert files for you, AND the script provided here will no longer work. So... Don't import the wrong files. 
+DSM certs **CAN** work if you upload a mixture of `fullchain.pem` and `chain.pem` as the Cert and Intermediate Certs respectively... However, future reverse proxy updates and DSM changes will become VERY slow as DSM reconstructs its own cert files for you, AND the script provided here will no longer work. So... Don't import the wrong files. Only updating the two shown here will make your system run much faster during restarts and when creating or editing Reverse Proxy entries.
 
 *_If you get browser untrusted errors with certs still, add `chain.pem` to the "Intermediate Certificate" - however DSM updates and reverse proxy changes will slow down a LOT._
 
